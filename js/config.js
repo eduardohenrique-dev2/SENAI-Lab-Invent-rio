@@ -77,7 +77,7 @@ function obterInventarioSupabase() {
 
 /*
  * Módulos complementares são carregados daqui para manter o index.html
- * simples e permitir evoluções do sistema sem alterar a estrutura base.
+ * simples e permitir evoluções sem alterar a estrutura principal.
  */
 (function carregarModulosInventario() {
   if (!document.querySelector('link[href="./css/importacoes.css"]')) {
@@ -87,9 +87,9 @@ function obterInventarioSupabase() {
     document.head.appendChild(style);
   }
 
-  if (!document.querySelector('script[src="./js/importacoes.js"]')) {
+  if (!document.querySelector('script[src="./js/importacoes-v2.js"]')) {
     const script = document.createElement("script");
-    script.src = "./js/importacoes.js";
+    script.src = "./js/importacoes-v2.js";
     script.defer = true;
     document.head.appendChild(script);
   }
