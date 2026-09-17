@@ -1,0 +1,50 @@
+/*
+ * Tipografia e identidade visual do SENAI Lab.
+ * Mantém a mesma pilha tipográfica do Sistema de Gestão de Demandas.
+ */
+@font-face {
+    font-family: "Neo Sans Pro Local";
+    src:
+        local("Neo Sans Pro Medium"),
+        local("NeoSansPro-Medium"),
+        local("Neo Sans Pro");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Neo Sans Pro Local";
+    src:
+        local("Neo Sans Pro Bold"),
+        local("NeoSansPro-Bold"),
+        local("Neo Sans Pro");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    --fonte-senai: "Neo Sans Pro Local", "Neo Sans Pro", "Barlow", Arial, Helvetica, sans-serif;
+    --logo-senai-lab: url("../assets/logo-senai-lab.svg");
+}
+
+html,
+body,
+button,
+input,
+select,
+textarea {
+    font-family: var(--fonte-senai) !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+strong,
+b {
+    font-family: var(--fonte-senai) !important;
+}
