@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "2.1.0";
+  const VERSION = "2.2.0";
   const CFG = {
     maxFiles: 10,
     maxFileSize: 20 * 1024 * 1024,
@@ -187,6 +187,22 @@
           <div class="panel-body"><div class="import-progress"><span id="v2ProgressBar"></span></div></div>
         </article>
 
+        <article class="panel import-danger-zone">
+          <header class="panel-header">
+            <div>
+              <h2>Limpeza de itens importados</h2>
+              <p>Remove do inventário ativo apenas os itens que foram criados pelo módulo de importação. Cadastros manuais e o histórico dos lotes são preservados.</p>
+            </div>
+            <button id="v2DeleteAllImported" class="button button--danger" type="button">Excluir todos os itens importados</button>
+          </header>
+          <div class="panel-body import-danger-zone__body">
+            <div>
+              <strong id="v2ImportedDeleteSummary">Verificando itens importados...</strong>
+              <small>Itens com empréstimo ou solicitação em aberto não serão removidos até a pendência ser encerrada.</small>
+            </div>
+          </div>
+        </article>
+
         <article class="panel">
           <header class="panel-header"><div><h2>Histórico de uploads</h2><p>Arquivos processados e resumo de cada lote.</p></div><button id="v2RefreshHistory" class="button button--secondary button--small" type="button">Atualizar</button></header>
           <div id="v2History" class="panel-body import-history"><div class="empty">Entre no sistema para consultar.</div></div>
@@ -206,6 +222,7 @@
     $("v2Confirm")?.addEventListener("click", confirmImport);
     $("v2DownloadErrors")?.addEventListener("click", downloadErrors);
     $("v2RefreshHistory")?.addEventListener("click", loadHistory);
+    $("v2DeleteAllImported")?.addEventListener("click", deleteAllImportedItems);
 
     const zone = $("v2ImportDropzone");
     if (zone) {
@@ -257,6 +274,7 @@
     if (allowed) {
       checkModule();
       loadHistory();
+      loadImportedDeleteSummary();
     }
   }
 
@@ -272,6 +290,7 @@
     if ($("sidebar")) $("sidebar").dataset.open = "false";
     checkModule();
     loadHistory();
+    loadImportedDeleteSummary();
   }
 
   async function checkModule() {
@@ -1129,6 +1148,101 @@
     }
   }
 
+  async function loadImportedDeleteSummary() {
+    const label = $("v2ImportedDeleteSummary");
+    const button = $("v2DeleteAllImported");
+    if (!label || !button || !state.profile?.ativo) return;
+
+    try {
+      const { data, error } = await db().rpc("inv_resumo_itens_importados");
+      if (error) throw error;
+
+      const total = Number(data?.total || 0);
+      const blocked = Number(data?.bloqueados || 0);
+      const eligible = Number(data?.elegiveis || 0);
+
+      label.textContent = total
+        ? total + " item(ns) importado(s) ativo(s) · " + eligible + " podem ser removidos" + (blocked ? " · " + blocked + " bloqueado(s)" : "")
+        : "Nenhum item importado ativo encontrado.";
+
+      button.disabled = eligible === 0;
+    } catch (error) {
+      button.disabled = true;
+      const message = String(error?.message || error);
+      label.textContent = /inv_resumo_itens_importados|could not find the function|does not exist/i.test(message)
+        ? "Ativação necessária: execute supabase/06_limpeza_itens_importados.sql."
+        : "Não foi possível verificar os itens importados: " + message;
+    }
+  }
+
+  async function deleteAllImportedItems() {
+    if (state.processing || !state.profile?.ativo) return;
+
+    const { data: summary, error: summaryError } = await db().rpc("inv_resumo_itens_importados");
+    if (summaryError) {
+      const message = String(summaryError?.message || summaryError);
+      return toast(
+        "Ativação necessária",
+        /inv_resumo_itens_importados|could not find the function|does not exist/i.test(message)
+          ? "Execute supabase/06_limpeza_itens_importados.sql no Supabase."
+          : message,
+        "danger"
+      );
+    }
+
+    const eligible = Number(summary?.elegiveis || 0);
+    const blocked = Number(summary?.bloqueados || 0);
+    if (!eligible) return toast("Nada para excluir", "Não há itens importados elegíveis para remoção.", "warning");
+
+    let promptText = "Você está prestes a remover " + eligible + " item(ns) importado(s) do inventário ativo.";
+    if (blocked) promptText += "\n\n" + blocked + " item(ns) com empréstimo/solicitação em aberto serão preservados.";
+    promptText += "\n\nCadastros manuais e histórico dos uploads serão preservados.";
+    promptText += "\n\nDigite EXCLUIR IMPORTADOS para confirmar:";
+
+    const confirmation = window.prompt(promptText);
+    if (confirmation !== "EXCLUIR IMPORTADOS") {
+      if (confirmation !== null) toast("Operação cancelada", "A frase de confirmação não corresponde.", "warning");
+      return;
+    }
+
+    const button = $("v2DeleteAllImported");
+    state.processing = true;
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Excluindo...";
+    }
+
+    try {
+      const { data, error } = await db().rpc("inv_excluir_todos_itens_importados", {
+        p_confirmacao: "EXCLUIR IMPORTADOS"
+      });
+      if (error) throw error;
+
+      const removed = Number(data?.removidos || 0);
+      const preserved = Number(data?.bloqueados || 0);
+      toast(
+        "Limpeza concluída",
+        removed + " item(ns) importado(s) removido(s) do inventário ativo." + (preserved ? " " + preserved + " preservado(s) por possuir pendência." : ""),
+        preserved ? "warning" : "success"
+      );
+
+      state.rows = [];
+      if ($("v2PreviewPanel")) $("v2PreviewPanel").hidden = true;
+      await loadReferences().catch(() => {});
+      await loadImportedDeleteSummary();
+      await loadHistory();
+      $("btnGlobalRefresh")?.click();
+    } catch (error) {
+      console.error("Falha ao excluir itens importados:", error);
+      toast("Não foi possível concluir a limpeza", error?.message || String(error), "danger");
+    } finally {
+      state.processing = false;
+      if (button) {
+        button.textContent = "Excluir todos os itens importados";
+        await loadImportedDeleteSummary();
+      }
+    }
+  }
   function downloadErrors() {
     const errors = state.rows.filter(row => row.action === "erro");
     if (!errors.length) return;
