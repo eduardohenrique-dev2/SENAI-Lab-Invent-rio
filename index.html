@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#06379a">
+  <title>SENAI Lab Inventário</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./css/tipografia-senai.css">
+  <link rel="stylesheet" href="./css/app.css">
+</head>
+<body>
+  <!-- LOGIN -->
+  <section id="loginScreen" class="login-screen">
+    <div class="login-brand">
+      <img class="login-brand__logo" src="./assets/logo-senai-lab.svg" alt="SENAI Lab">
+      <h1>INVENTÁRIO<br><span>INTELIGENTE</span></h1>
+      <p>Patrimônio, estoque, empréstimos, manutenção, localização física, QR Code e rastreabilidade completa do laboratório em uma única plataforma.</p>
+    </div>
+
+    <div class="login-panel">
+      <form id="loginForm" class="login-card">
+        <h2>Acesso ao Inventário</h2>
+        <p>Entre com sua conta autorizada do ecossistema SENAI Lab.</p>
+
+        <div class="login-field">
+          <label for="loginEmail">E-mail</label>
+          <input id="loginEmail" name="email" type="email" autocomplete="username" required maxlength="320">
+        </div>
+        <div class="login-field">
+          <label for="loginPassword">Senha</label>
+          <input id="loginPassword" name="password" type="password" autocomplete="current-password" required minlength="8" maxlength="256">
+        </div>
+
+        <div class="h-captcha" data-sitekey="99b6aeca-0a42-4d56-b8be-06f0e2c068f6"></div>
+        <p id="loginError" class="login-error" hidden></p>
+        <button id="btnLogin" class="button" type="submit" style="width:100%">Entrar no sistema</button>
+        <p class="login-help">O acesso é controlado por perfil. Administrador, Gestor, Instrutor, Aluno e Auditor possuem permissões diferentes.</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- APP -->
+  <div id="appShell" class="app-shell" hidden>
+    <aside id="sidebar" class="sidebar" data-open="false">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand__box">
+          <img src="./assets/logo-senai-lab.svg" alt="SENAI Lab">
+        </div>
+        <div class="sidebar-title">
+          <strong>INVENTÁRIO</strong>
+          <span>V1</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Navegação principal">
+        <p class="nav-group">Visão geral</p>
+        <button class="nav-button" data-view="dashboard" aria-current="page"><span class="nav-icon">▦</span>Dashboard</button>
+        <button class="nav-button" data-view="inventario"><span class="nav-icon">▣</span>Inventário</button>
+        <button class="nav-button" data-view="estoque"><span class="nav-icon">▤</span>Estoque <span id="navLowStock" class="nav-badge" hidden>0</span></button>
+
+        <p class="nav-group">Operação</p>
+        <button class="nav-button" data-view="emprestimos"><span class="nav-icon">↗</span>Empréstimos <span id="navLoans" class="nav-badge" hidden>0</span></button>
+        <button class="nav-button" data-view="devolucoes"><span class="nav-icon">↙</span>Devoluções</button>
+        <button class="nav-button" data-view="movimentacoes"><span class="nav-icon">⇄</span>Movimentações</button>
+        <button class="nav-button" data-view="manutencao"><span class="nav-icon">⚙</span>Manutenção</button>
+        <button class="nav-button" data-view="fisico"><span class="nav-icon">☑</span>Inventário físico</button>
+
+        <p class="nav-group">Estrutura</p>
+        <button class="nav-button" data-view="localizacoes"><span class="nav-icon">⌖</span>Localizações</button>
+        <button class="nav-button" data-view="qrcode"><span class="nav-icon">▧</span>QR Code</button>
+        <button class="nav-button" data-view="usuarios" data-role-min="administrador"><span class="nav-icon">♟</span>Usuários</button>
+
+        <p class="nav-group">Gestão</p>
+        <button class="nav-button" data-view="relatorios"><span class="nav-icon">▥</span>Relatórios</button>
+        <button class="nav-button" data-view="auditoria" data-role-any="administrador,gestor,auditor"><span class="nav-icon">⌘</span>Auditoria</button>
+        <button class="nav-button" data-view="notificacoes"><span class="nav-icon">◉</span>Notificações <span id="navNotifications" class="nav-badge" hidden>0</span></button>
+        <button class="nav-button" data-view="configuracoes" data-role-any="administrador,gestor"><span class="nav-icon">⚙</span>Configurações</button>
+      </nav>
+
+      <div class="sidebar-user">
+        <div class="sidebar-user__card">
+          <div id="userAvatar" class="user-avatar">S</div>
+          <div class="sidebar-user__meta">
+            <strong id="userName">Usuário</strong>
+            <span id="userRole">Perfil</span>
+          </div>
+          <button id="btnLogout" class="icon-button" type="button" title="Sair">↪</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-shell">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="btnMobileMenu" class="mobile-menu" type="button" aria-label="Abrir menu">☰</button>
+          <div class="page-title">
+            <h1 id="pageTitle">Dashboard</h1>
+            <span id="pageSubtitle">Visão geral do laboratório</span>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <div id="healthPill" class="health-pill" data-state="checking"><span>Conectando</span></div>
+          <button id="btnGlobalRefresh" class="icon-button" type="button" title="Atualizar dados">↻</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <!-- DASHBOARD -->
+        <section id="view-dashboard" class="view" data-active="true">
+          <div class="kpi-grid">
+            <article class="kpi-card"><span>Total de itens</span><strong id="kpiTotal">0</strong><small>Itens ativos cadastrados</small></article>
+            <article class="kpi-card" data-tone="success"><span>Disponíveis</span><strong id="kpiDisponiveis">0</strong><small>Prontos para uso</small></article>
+            <article class="kpi-card"><span>Em uso</span><strong id="kpiEmUso">0</strong><small>Alocados atualmente</small></article>
+            <article class="kpi-card"><span>Emprestados</span><strong id="kpiEmprestados">0</strong><small>Fora do laboratório</small></article>
+            <article class="kpi-card" data-tone="warning"><span>Manutenção</span><strong id="kpiManutencao">0</strong><small>Indisponíveis por manutenção</small></article>
+            <article class="kpi-card" data-tone="danger"><span>Danificados</span><strong id="kpiDanificados">0</strong><small>Necessitam avaliação</small></article>
+            <article class="kpi-card" data-tone="warning"><span>Estoque baixo</span><strong id="kpiEstoqueBaixo">0</strong><small>Abaixo ou no mínimo</small></article>
+            <article class="kpi-card" data-tone="warning"><span>Sem localização</span><strong id="kpiSemLocal">0</strong><small>Precisam ser localizados</small></article>
+            <article class="kpi-card"><span>Patrimônio estimado</span><strong id="kpiPatrimonio">R$ 0</strong><small>Valor cadastrado</small></article>
+            <article class="kpi-card" data-tone="danger"><span>Empréstimos atrasados</span><strong id="kpiAtrasados">0</strong><small>Previsão vencida</small></article>
+          </div>
+
+          <div class="dashboard-grid">
+            <div class="dashboard-stack">
+              <article class="panel">
+                <header class="panel-header"><div><h2>Últimas movimentações</h2><p>Rastreabilidade recente do laboratório</p></div><button class="button button--secondary button--small" data-view-jump="movimentacoes">Ver todas</button></header>
+                <div id="dashboardActivity" class="panel-body activity-list"><div class="empty">Carregando movimentações...</div></div>
+              </article>
+              <article class="panel">
+                <header class="panel-header"><div><h2>Distribuição por status</h2><p>Estado atual do patrimônio</p></div></header>
+                <div id="dashboardStatus" class="panel-body cards-grid"></div>
+              </article>
+            </div>
+            <article class="panel">
+              <header class="panel-header"><div><h2>Alertas importantes</h2><p>Itens que exigem atenção</p></div></header>
+              <div id="dashboardAlerts" class="panel-body alert-list"><div class="empty">Calculando alertas...</div></div>
+            </article>
+          </div>
+        </section>
+
+        <!-- INVENTÁRIO -->
+        <section id="view-inventario" class="view">
+          <article class="panel">
+            <header class="panel-header">
+              <div><h2>Itens do laboratório</h2><p>Equipamentos, materiais, componentes e consumíveis</p></div>
+              <button id="btnNewItem" class="button" type="button">+ Novo item</button>
+            </header>
+            <div class="panel-body">
+              <div class="toolbar">
+                <div class="toolbar-field toolbar-field--grow"><label for="itemSearch">Buscar</label><input id="itemSearch" type="search" placeholder="Nome, patrimônio, série, marca, código ou responsável"></div>
+                <div class="toolbar-field"><label for="itemTypeFilter">Tipo</label><select id="itemTypeFilter"><option value="">Todos</option><option value="equipamento">Equipamentos</option><option value="material">Materiais</option><option value="componente">Componentes</option><option value="consumivel">Consumíveis</option></select></div>
+                <div class="toolbar-field"><label for="itemStatusFilter">Status</label><select id="itemStatusFilter"><option value="">Todos</option><option value="disponivel">Disponível</option><option value="em_uso">Em uso</option><option value="emprestado">Emprestado</option><option value="manutencao">Manutenção</option><option value="danificado">Danificado</option><option value="reservado">Reservado</option><option value="perdido">Perdido</option></select></div>
+                <div class="toolbar-field"><label for="itemLocationFilter">Local</label><select id="itemLocationFilter"><option value="">Todos</option></select></div>
+                <button id="btnClearItemFilters" class="button button--secondary" type="button">Limpar</button>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Item</th><th>Patrimônio</th><th>Tipo</th><th>Qtd.</th><th>Status</th><th>Localização</th><th>Responsável</th><th>Ações</th></tr></thead>
+                  <tbody id="itemsTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <!-- ESTOQUE -->
+        <section id="view-estoque" class="view">
+          <div class="kpi-grid">
+            <article class="kpi-card"><span>Itens controlados</span><strong id="stockTotal">0</strong><small>Com quantidade em estoque</small></article>
+            <article class="kpi-card" data-tone="warning"><span>Estoque baixo</span><strong id="stockLow">0</strong><small>No mínimo ou abaixo</small></article>
+            <article class="kpi-card" data-tone="danger"><span>Sem estoque</span><strong id="stockZero">0</strong><small>Quantidade zerada</small></article>
+          </div>
+          <article class="panel">
+            <header class="panel-header"><div><h2>Controle de estoque</h2><p>Consumíveis, materiais e componentes</p></div><button id="btnStockMovement" class="button" type="button">Registrar movimentação</button></header>
+            <div class="panel-body">
+              <div class="table-wrap"><table><thead><tr><th>Item</th><th>Tipo</th><th>Quantidade</th><th>Mínimo</th><th>Situação</th><th>Local</th><th>Ações</th></tr></thead><tbody id="stockTableBody"></tbody></table></div>
+            </div>
+          </article>
+        </section>
+
+        <!-- EMPRÉSTIMOS -->
+        <section id="view-emprestimos" class="view">
+          <article class="panel">
+            <header class="panel-header"><div><h2>Empréstimos</h2><p>Solicitações, retiradas e devoluções</p></div><button id="btnNewLoan" class="button" type="button">+ Novo empréstimo</button></header>
+            <div class="panel-body">
+              <div class="toolbar">
+                <div class="toolbar-field toolbar-field--grow"><label for="loanSearch">Buscar</label><input id="loanSearch" type="search" placeholder="Item, pessoa ou e-mail"></div>
+                <div class="toolbar-field"><label for="loanStatusFilter">Status</label><select id="loanStatusFilter"><option value="">Todos</option><option value="solicitado">Solicitado</option><option value="aberto">Em aberto</option><option value="atrasado">Atrasado</option><option value="devolvido">Devolvido</option><option value="perdido">Perdido</option><option value="cancelado">Cancelado</option></select></div>
+              </div>
+              <div class="table-wrap"><table><thead><tr><th>Item</th><th>Retirado por</th><th>Qtd.</th><th>Retirada</th><th>Previsão</th><th>Status</th><th>Ações</th></tr></thead><tbody id="loansTableBody"></tbody></table></div>
+            </div>
+          </article>
+        </section>
+
+        <!-- DEVOLUÇÕES -->
+        <section id="view-devolucoes" class="view">
+          <article class="panel">
+            <header class="panel-header"><div><h2>Devoluções pendentes</h2><p>Empréstimos abertos ou atrasados aguardando retorno</p></div></header>
+            <div class="panel-body"><div id="returnsCards" class="cards-grid"></div></div>
+          </article>
+        </section>
+
+        <!-- MOVIMENTAÇÕES -->
+        <section id="view-movimentacoes" class="view">
+          <article class="panel">
+            <header class="panel-header"><div><h2>Movimentações</h2><p>Entrada, saída, transferência, ajuste, manutenção e baixa</p></div><button id="btnNewMovement" class="button" type="button">+ Movimentar item</button></header>
+            <div class="panel-body">
+              <div class="toolbar"><div class="toolbar-field toolbar-field--grow"><label for="movementSearch">Buscar</label><input id="movementSearch" type="search" placeholder="Item, responsável ou motivo"></div><div class="toolbar-field"><label for="movementTypeFilter">Tipo</label><select id="movementTypeFilter"><option value="">Todos</option><option value="entrada">Entrada</option><option value="saida">Saída</option><option value="transferencia">Transferência</option><option value="emprestimo">Empréstimo</option><option value="devolucao">Devolução</option><option value="manutencao">Manutenção</option><option value="baixa">Baixa</option><option value="ajuste">Ajuste</option></select></div></div>
+              <div class="table-wrap"><table><thead><tr><th>Data</th><th>Item</th><th>Tipo</th><th>Qtd.</th><th>Responsável</th><th>Motivo</th><th>Origem → destino</th></tr></thead><tbody id="movementsTableBody"></tbody></table></div>
+            </div>
+          </article>
+        </section>
+
+        <!-- MANUTENÇÃO -->
+        <section id="view-manutencao" class="view">
+          <article class="panel">
+            <header class="panel-header"><div><h2>Manutenção</h2><p>Histórico técnico, custos, peças e previsões</p></div><button id="btnNewMaintenance" class="button" type="button">+ Abrir manutenção</button></header>
+            <div class="panel-body"><div id="maintenanceCards" class="cards-grid"></div></div>
+          </article>
+        </section>
+
+        <!-- INVENTÁRIO FÍSICO -->
+        <section id="view-fisico" class="view">
+          <article class="panel">
+            <header class="panel-header"><div><h2>Inventário físico</h2><p>Conferência presencial dos itens do laboratório</p></div><button id="btnNewPhysical" class="button" type="button">+ Iniciar inventário</button></header>
+            <div class="panel-body"><div id="physicalCards" class="cards-grid"></div></div>
+          </article>
+        </section>
+
+        <!-- LOCALIZAÇÕES -->
+        <section id="view-localizacoes" class="view">
+          <article class="panel">
+            <header class="panel-header"><div><h2>Localizações físicas</h2><p>Unidade → laboratório → sala → armário → prateleira</p></div><button id="btnNewLocation" class="button" type="button">+ Nova localização</button></header>
+            <div class="panel-body"><div id="locationTree" class="location-tree"></div></div>
+          </article>
+        </section>
+
+        <!-- QR CODE -->
+        <section id="view-qrcode" class="view">
+          <article class="panel">
+            <header class="panel-header"><div><h2>QR Code / Código de barras</h2><p>Gere etiquetas individuais para rastreamento físico</p></div></header>
+            <div class="panel-body">
+              <div class="toolbar"><div class="toolbar-field toolbar-field--grow"><label for="qrItemSelect">Item</label><select id="qrItemSelect"><option value="">Selecione um item</option></select></div><button id="btnGenerateQr" class="button" type="button">Gerar etiqueta</button><button id="btnPrintQr" class="button button--secondary" type="button">Imprimir</button></div>
+              <div id="qrSheet" class="qr-sheet">
+                <img class="logo" src="./assets/logo-senai-lab.svg" alt="SENAI Lab">
+                <h2 id="qrItemName">Selecione um item</h2>
+                <p id="qrItemPatrimonio">Patrimônio: —</p>
+                <div id="qrCanvas" class="qr-canvas"></div>
+                <p id="qrItemCode">Código: —</p>
+                <p id="qrItemStatus">Status: —</p>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <!-- USUÁRIOS -->
+        <section id="view-usuarios" class="view">
+          <article class="panel">
+            <header class="panel-header"><div><h2>Usuários e permissões</h2><p>Controle dos perfis de acesso ao inventário</p></div></header>
+            <div class="panel-body"><div class="table-wrap"><table><thead><tr><th>Usuário</th><th>E-mail</th><th>Perfil</th><th>Ativo</th><th>Ações</th></tr></thead><tbody id="usersTableBody"></tbody></table></div></div>
+          </article>
+        </section>
+
+        <!-- RELATÓRIOS -->
+        <section id="view-relatorios" class="view">
+          <div class="report-grid">
+            <article class="report-card"><h3>Inventário geral</h3><p>Relação completa de itens com patrimônio, status, localização e valor.</p><div class="report-card__actions"><button class="button button--small" data-report="inventario" data-format="csv">CSV</button><button class="button button--secondary button--small" data-report="inventario" data-format="xlsx">Excel</button><button class="button button--secondary button--small" data-report="inventario" data-format="pdf">PDF</button></div></article>
+            <article class="report-card"><h3>Estoque</h3><p>Quantidades, mínimos e itens em situação de reposição.</p><div class="report-card__actions"><button class="button button--small" data-report="estoque" data-format="csv">CSV</button><button class="button button--secondary button--small" data-report="estoque" data-format="xlsx">Excel</button><button class="button button--secondary button--small" data-report="estoque" data-format="pdf">PDF</button></div></article>
+            <article class="report-card"><h3>Empréstimos</h3><p>Empréstimos solicitados, abertos, atrasados, devolvidos e perdidos.</p><div class="report-card__actions"><button class="button button--small" data-report="emprestimos" data-format="csv">CSV</button><button class="button button--secondary button--small" data-report="emprestimos" data-format="xlsx">Excel</button><button class="button button--secondary button--small" data-report="emprestimos" data-format="pdf">PDF</button></div></article>
+            <article class="report-card"><h3>Manutenções</h3><p>Ocorrências técnicas, custos, previsões, diagnósticos e soluções.</p><div class="report-card__actions"><button class="button button--small" data-report="manutencoes" data-format="csv">CSV</button><button class="button button--secondary button--small" data-report="manutencoes" data-format="xlsx">Excel</button><button class="button button--secondary button--small" data-report="manutencoes" data-format="pdf">PDF</button></div></article>
+            <article class="report-card"><h3>Movimentações</h3><p>Rastreabilidade de entradas, saídas, transferências e ajustes.</p><div class="report-card__actions"><button class="button button--small" data-report="movimentacoes" data-format="csv">CSV</button><button class="button button--secondary button--small" data-report="movimentacoes" data-format="xlsx">Excel</button><button class="button button--secondary button--small" data-report="movimentacoes" data-format="pdf">PDF</button></div></article>
+            <article class="report-card"><h3>Inventário físico</h3><p>Resultados de conferência: encontrados, ausentes e danificados.</p><div class="report-card__actions"><button class="button button--small" data-report="fisico" data-format="csv">CSV</button><button class="button button--secondary button--small" data-report="fisico" data-format="xlsx">Excel</button><button class="button button--secondary button--small" data-report="fisico" data-format="pdf">PDF</button></div></article>
+          </div>
+        </section>
+
+        <!-- AUDITORIA -->
+        <section id="view-auditoria" class="view">
+          <article class="panel"><header class="panel-header"><div><h2>Auditoria</h2><p>Registro técnico de alterações realizadas no sistema</p></div></header><div class="panel-body"><div class="table-wrap"><table><thead><tr><th>Data</th><th>Ação</th><th>Entidade</th><th>ID</th><th>Usuário</th><th>Detalhes</th></tr></thead><tbody id="auditTableBody"></tbody></table></div></div></article>
+        </section>
+
+        <!-- NOTIFICAÇÕES -->
+        <section id="view-notificacoes" class="view">
+          <article class="panel"><header class="panel-header"><div><h2>Notificações</h2><p>Alertas e avisos do inventário</p></div><button id="btnReadNotifications" class="button button--secondary" type="button">Marcar como lidas</button></header><div id="notificationsList" class="panel-body alert-list"></div></article>
+        </section>
+
+        <!-- CONFIGURAÇÕES -->
+        <section id="view-configuracoes" class="view">
+          <article class="panel"><header class="panel-header"><div><h2>Configurações</h2><p>Parâmetros operacionais do inventário</p></div></header><div class="panel-body"><form id="settingsForm" class="form-grid"><div class="field"><label for="settingPrefix">Prefixo de código</label><input id="settingPrefix" value="LAB-INV"></div><div class="field"><label for="settingWarranty">Alerta de garantia (dias)</label><input id="settingWarranty" type="number" min="1" value="30"></div><div class="field"><label for="settingMaintenance">Alerta de manutenção (dias)</label><input id="settingMaintenance" type="number" min="1" value="7"></div><div class="field"><label for="settingIdle">Item parado (horas)</label><input id="settingIdle" type="number" min="1" value="168"></div><div class="field--wide"><button class="button" type="submit">Salvar configurações</button></div></form></div></article>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL ITEM -->
+  <div id="itemModal" class="modal-backdrop" hidden>
+    <form id="itemForm" class="modal">
+      <header class="modal-header"><h2 id="itemModalTitle">Novo item</h2><button class="icon-button" type="button" data-close-modal="itemModal">×</button></header>
+      <div class="modal-body form-grid">
+        <input id="itemId" type="hidden">
+        <p class="form-section">Identificação</p>
+        <div class="field"><label for="itemCode">Código interno *</label><input id="itemCode" required maxlength="80"></div>
+        <div class="field"><label for="itemAsset">Patrimônio</label><input id="itemAsset" maxlength="100"></div>
+        <div class="field"><label for="itemName">Nome *</label><input id="itemName" required maxlength="180"></div>
+        <div class="field"><label for="itemType">Tipo *</label><select id="itemType" required><option value="equipamento">Equipamento</option><option value="material">Material</option><option value="componente">Componente</option><option value="consumivel">Consumível</option></select></div>
+        <div class="field"><label for="itemCategory">Categoria</label><select id="itemCategory"><option value="">Sem categoria</option></select></div>
+        <div class="field"><label for="itemSubcategory">Subcategoria</label><input id="itemSubcategory"></div>
+        <div class="field"><label for="itemBrand">Marca</label><input id="itemBrand"></div>
+        <div class="field"><label for="itemModel">Modelo</label><input id="itemModel"></div>
+        <div class="field"><label for="itemSerial">Número de série</label><input id="itemSerial"></div>
+        <div class="field"><label for="itemBarcode">Código de barras</label><input id="itemBarcode"></div>
+        <div class="field field--span2"><label for="itemPhoto">Foto</label><input id="itemPhoto" type="file" accept="image/png,image/jpeg,image/webp"><span class="file-note">PNG, JPG ou WEBP. Máximo 20 MB.</span></div>
+
+        <p class="form-section">Informações técnicas</p>
+        <div class="field field--wide"><label for="itemDescription">Descrição</label><textarea id="itemDescription"></textarea></div>
+        <div class="field field--wide"><label for="itemSpecs">Especificações</label><textarea id="itemSpecs"></textarea></div>
+        <div class="field"><label for="itemVoltage">Voltagem</label><input id="itemVoltage"></div>
+        <div class="field"><label for="itemPower">Potência</label><input id="itemPower"></div>
+        <div class="field"><label for="itemCapacity">Capacidade</label><input id="itemCapacity"></div>
+        <div class="field"><label for="itemManufacturer">Fabricante</label><input id="itemManufacturer"></div>
+        <div class="field field--span2"><label for="itemManual">Manual / documentação</label><input id="itemManual" type="file" accept="application/pdf,image/png,image/jpeg,image/webp"></div>
+
+        <p class="form-section">Controle</p>
+        <div class="field"><label for="itemQuantity">Quantidade *</label><input id="itemQuantity" type="number" min="0" step="0.001" value="1" required></div>
+        <div class="field"><label for="itemUnit">Unidade</label><input id="itemUnit" value="un"></div>
+        <div class="field"><label for="itemMinStock">Estoque mínimo</label><input id="itemMinStock" type="number" min="0" step="0.001" value="0"></div>
+        <div class="field"><label for="itemLocation">Localização</label><select id="itemLocation"><option value="">Sem localização</option></select></div>
+        <div class="field"><label for="itemCabinet">Armário</label><input id="itemCabinet"></div>
+        <div class="field"><label for="itemShelf">Prateleira</label><input id="itemShelf"></div>
+        <div class="field"><label for="itemResponsible">Responsável</label><input id="itemResponsible"></div>
+        <div class="field"><label for="itemStatus">Status</label><select id="itemStatus"><option value="disponivel">Disponível</option><option value="em_uso">Em uso</option><option value="emprestado">Emprestado</option><option value="manutencao">Manutenção</option><option value="danificado">Danificado</option><option value="reservado">Reservado</option><option value="perdido">Perdido</option></select></div>
+        <div class="field"><label for="itemAcquired">Data de aquisição</label><input id="itemAcquired" type="date"></div>
+        <div class="field"><label for="itemValue">Valor unitário</label><input id="itemValue" type="number" min="0" step="0.01"></div>
+        <div class="field"><label for="itemWarranty">Garantia até</label><input id="itemWarranty" type="date"></div>
+        <div class="field field--span2"><label for="itemInvoice">Nota fiscal</label><input id="itemInvoice" type="file" accept="application/pdf,image/png,image/jpeg,image/webp"><span class="file-note">Arquivo armazenado no bucket privado.</span></div>
+        <div class="field field--wide"><label for="itemNotes">Observações internas</label><textarea id="itemNotes"></textarea></div>
+      </div>
+      <footer class="modal-footer"><button class="button button--secondary" type="button" data-close-modal="itemModal">Cancelar</button><button id="btnSaveItem" class="button" type="submit">Salvar item</button></footer>
+    </form>
+  </div>
+
+  <!-- MODAL MOVIMENTAÇÃO -->
+  <div id="movementModal" class="modal-backdrop" hidden><form id="movementForm" class="modal modal--small"><header class="modal-header"><h2>Registrar movimentação</h2><button class="icon-button" type="button" data-close-modal="movementModal">×</button></header><div class="modal-body form-grid"><div class="field field--wide"><label for="movementItem">Item *</label><select id="movementItem" required></select></div><div class="field"><label for="movementType">Tipo *</label><select id="movementType" required><option value="entrada">Entrada</option><option value="saida">Saída</option><option value="transferencia">Transferência</option><option value="ajuste">Ajuste de estoque</option><option value="manutencao">Enviar à manutenção</option><option value="baixa">Baixa</option></select></div><div class="field"><label for="movementQuantity">Quantidade</label><input id="movementQuantity" type="number" min="0.001" step="0.001" value="1"></div><div class="field field--wide"><label for="movementDestination">Destino</label><select id="movementDestination"><option value="">Sem alteração</option></select></div><div class="field field--wide"><label for="movementResponsible">Responsável / destino externo</label><input id="movementResponsible"></div><div class="field field--wide"><label for="movementReason">Motivo</label><input id="movementReason"></div><div class="field field--wide"><label for="movementNotes">Observações</label><textarea id="movementNotes"></textarea></div></div><footer class="modal-footer"><button class="button button--secondary" type="button" data-close-modal="movementModal">Cancelar</button><button class="button" type="submit">Registrar</button></footer></form></div>
+
+  <!-- MODAL EMPRÉSTIMO -->
+  <div id="loanModal" class="modal-backdrop" hidden><form id="loanForm" class="modal modal--small"><header class="modal-header"><h2>Novo empréstimo</h2><button class="icon-button" type="button" data-close-modal="loanModal">×</button></header><div class="modal-body form-grid"><div class="field field--wide"><label for="loanItem">Item *</label><select id="loanItem" required></select></div><div class="field"><label for="loanQuantity">Quantidade *</label><input id="loanQuantity" type="number" min="0.001" step="0.001" value="1" required></div><div class="field"><label for="loanDue">Previsão de devolução *</label><input id="loanDue" type="datetime-local" required></div><div class="field"><label for="loanPerson">Quem retirará *</label><input id="loanPerson" required></div><div class="field"><label for="loanEmail">E-mail</label><input id="loanEmail" type="email"></div><div class="field field--wide"><label for="loanCondition">Estado do equipamento na retirada</label><input id="loanCondition" placeholder="Ex.: Funcionando, sem avarias"></div><div class="field field--wide"><label for="loanNotes">Observações</label><textarea id="loanNotes"></textarea></div></div><footer class="modal-footer"><button class="button button--secondary" type="button" data-close-modal="loanModal">Cancelar</button><button class="button" type="submit">Registrar / solicitar</button></footer></form></div>
+
+  <!-- MODAL DEVOLUÇÃO -->
+  <div id="returnModal" class="modal-backdrop" hidden><form id="returnForm" class="modal modal--small"><header class="modal-header"><h2>Registrar devolução</h2><button class="icon-button" type="button" data-close-modal="returnModal">×</button></header><div class="modal-body form-grid"><input id="returnLoanId" type="hidden"><div class="field field--wide"><label for="returnCondition">Estado na devolução</label><input id="returnCondition" placeholder="Ex.: Funcionando, sem avarias"></div><div class="field field--wide"><label for="returnNotes">Observações</label><textarea id="returnNotes"></textarea></div></div><footer class="modal-footer"><button class="button button--secondary" type="button" data-close-modal="returnModal">Cancelar</button><button class="button" type="submit">Confirmar devolução</button></footer></form></div>
+
+  <!-- MODAL MANUTENÇÃO -->
+  <div id="maintenanceModal" class="modal-backdrop" hidden><form id="maintenanceForm" class="modal"><header class="modal-header"><h2>Ficha de manutenção</h2><button class="icon-button" type="button" data-close-modal="maintenanceModal">×</button></header><div class="modal-body form-grid"><input id="maintenanceId" type="hidden"><div class="field field--span2"><label for="maintenanceItem">Equipamento *</label><select id="maintenanceItem" required></select></div><div class="field"><label for="maintenanceType">Tipo</label><select id="maintenanceType"><option value="corretiva">Corretiva</option><option value="preventiva">Preventiva</option><option value="calibracao">Calibração</option><option value="inspecao">Inspeção</option><option value="outro">Outro</option></select></div><div class="field field--wide"><label for="maintenanceProblem">Problema *</label><textarea id="maintenanceProblem" required></textarea></div><div class="field"><label for="maintenanceTech">Técnico responsável</label><input id="maintenanceTech"></div><div class="field"><label for="maintenanceCost">Custo</label><input id="maintenanceCost" type="number" min="0" step="0.01"></div><div class="field"><label for="maintenanceSend">Data de envio</label><input id="maintenanceSend" type="date"></div><div class="field"><label for="maintenanceForecast">Previsão</label><input id="maintenanceForecast" type="date"></div><div class="field"><label for="maintenanceStatus">Status</label><select id="maintenanceStatus"><option value="aberta">Aberta</option><option value="em_andamento">Em andamento</option><option value="aguardando_peca">Aguardando peça</option><option value="concluida">Concluída</option><option value="cancelada">Cancelada</option></select></div><div class="field field--wide"><label for="maintenanceParts">Peças utilizadas</label><textarea id="maintenanceParts"></textarea></div><div class="field field--wide"><label for="maintenanceDiagnosis">Diagnóstico</label><textarea id="maintenanceDiagnosis"></textarea></div><div class="field field--wide"><label for="maintenanceSolution">Solução</label><textarea id="maintenanceSolution"></textarea></div></div><footer class="modal-footer"><button class="button button--secondary" type="button" data-close-modal="maintenanceModal">Cancelar</button><button class="button" type="submit">Salvar manutenção</button></footer></form></div>
+
+  <!-- MODAL LOCALIZAÇÃO -->
+  <div id="locationModal" class="modal-backdrop" hidden><form id="locationForm" class="modal modal--small"><header class="modal-header"><h2>Nova localização</h2><button class="icon-button" type="button" data-close-modal="locationModal">×</button></header><div class="modal-body form-grid"><input id="locationId" type="hidden"><div class="field field--wide"><label for="locationParent">Local pai</label><select id="locationParent"><option value="">Raiz</option></select></div><div class="field"><label for="locationName">Nome *</label><input id="locationName" required></div><div class="field"><label for="locationCode">Código</label><input id="locationCode"></div><div class="field"><label for="locationType">Tipo</label><select id="locationType"><option value="unidade">Unidade</option><option value="laboratorio">Laboratório</option><option value="sala">Sala</option><option value="almoxarifado">Almoxarifado</option><option value="armario">Armário</option><option value="prateleira">Prateleira</option><option value="local">Local</option></select></div><div class="field field--wide"><label for="locationDescription">Descrição</label><textarea id="locationDescription"></textarea></div></div><footer class="modal-footer"><button class="button button--secondary" type="button" data-close-modal="locationModal">Cancelar</button><button class="button" type="submit">Salvar localização</button></footer></form></div>
+
+  <!-- MODAL INVENTÁRIO FÍSICO -->
+  <div id="physicalModal" class="modal-backdrop" hidden><form id="physicalForm" class="modal modal--small"><header class="modal-header"><h2>Iniciar inventário físico</h2><button class="icon-button" type="button" data-close-modal="physicalModal">×</button></header><div class="modal-body form-grid"><div class="field field--wide"><label for="physicalTitle">Título *</label><input id="physicalTitle" placeholder="Ex.: Inventário Setembro 2026" required></div><div class="field field--wide"><label for="physicalResponsible">Responsável *</label><input id="physicalResponsible" required></div><div class="field field--wide"><label for="physicalNotes">Observações</label><textarea id="physicalNotes"></textarea></div></div><footer class="modal-footer"><button class="button button--secondary" type="button" data-close-modal="physicalModal">Cancelar</button><button class="button" type="submit">Criar lista de conferência</button></footer></form></div>
+
+  <!-- MODAL CONTAGEM -->
+  <div id="countModal" class="modal-backdrop" hidden><section class="modal"><header class="modal-header"><div><h2 id="countTitle">Inventário físico</h2><p id="countSubtitle" class="muted"></p></div><button class="icon-button" type="button" data-close-modal="countModal">×</button></header><div class="modal-body"><div class="count-progress"><div class="count-stat"><span>Total</span><strong id="countTotal">0</strong></div><div class="count-stat"><span>Encontrados</span><strong id="countFound">0</strong></div><div class="count-stat"><span>Não encontrados</span><strong id="countMissing">0</strong></div><div class="count-stat"><span>Danificados</span><strong id="countDamaged">0</strong></div></div><div id="countList" style="margin-top:14px"></div></div><footer class="modal-footer"><button id="btnFinishPhysical" class="button" type="button">Concluir inventário</button></footer></section></div>
+
+  <!-- MODAL HISTÓRICO -->
+  <div id="historyModal" class="modal-backdrop" hidden><section class="modal"><header class="modal-header"><div><h2 id="historyTitle">Histórico do item</h2><p id="historySubtitle" class="muted"></p></div><button class="icon-button" type="button" data-close-modal="historyModal">×</button></header><div id="historyBody" class="modal-body"></div></section></div>
+
+  <div id="toastStack" class="toast-stack" aria-live="polite"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.115.0"></script>
+  <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>
