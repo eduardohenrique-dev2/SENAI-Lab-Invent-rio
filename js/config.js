@@ -93,4 +93,11 @@ function obterInventarioSupabase() {
     script.defer = true;
     document.head.appendChild(script);
   }
+
+  if (!document.querySelector('script[src="./js/exclusoes.js"]')) {
+    const script = document.createElement("script");
+    script.src = "./js/exclusoes.js";
+    script.defer = true;
+    document.head.appendChild(script);
+  }
 })();
