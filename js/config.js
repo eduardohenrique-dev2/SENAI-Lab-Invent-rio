@@ -87,9 +87,9 @@ function obterInventarioSupabase() {
     document.head.appendChild(style);
   }
 
-  if (!document.querySelector('script[src="./js/importacoes-v2.js?v=20260917-21"]')) {
+  if (!document.querySelector('script[src="./js/importacoes-v2.js?v=20260917-22"]')) {
     const script = document.createElement("script");
-    script.src = "./js/importacoes-v2.js?v=20260917-21";
+    script.src = "./js/importacoes-v2.js?v=20260917-22";
     script.defer = true;
     document.head.appendChild(script);
   }
