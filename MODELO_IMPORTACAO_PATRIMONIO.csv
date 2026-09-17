@@ -1,0 +1,3 @@
+Patrimônio;Código Interno;Nome;Categoria;Tipo;Marca;Modelo;Número de Série;Quantidade;Unidade;Sala;Armário;Prateleira;Responsável;Status;Data Aquisição;Valor Unitário;Garantia até;Descrição
+PAT-0001;LAB-INV-0001;Osciloscópio;Eletrônica;Equipamento;Tektronix;TBS1052B;SN123456;1;un;Sala 02;Armário A;Prateleira 01;Laboratório;Disponível;15/02/2026;3500,00;15/02/2027;Osciloscópio digital de bancada
+PAT-0002;LAB-INV-0002;Arduino UNO;Arduino / Microcontroladores;Componente;Arduino;UNO R3;;10;un;Sala 01;Armário B;Prateleira 02;Laboratório;Disponível;20/02/2026;120,00;;Placa de desenvolvimento
