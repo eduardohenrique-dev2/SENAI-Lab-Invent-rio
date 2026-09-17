@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "2.0.0";
+  const VERSION = "2.1.0";
   const CFG = {
     maxFiles: 10,
     maxFileSize: 20 * 1024 * 1024,
@@ -32,6 +32,7 @@
   addAliases("patrimonio", ["patrimonio", "patrimônio", "n patrimonio", "nº patrimonio", "numero patrimonio", "número patrimônio", "tombamento", "tombo", "plaqueta", "placa patrimonio", "placa patrimônio"]);
   addAliases("nome", ["nome", "item", "bem", "descricao do bem", "descrição do bem", "nome do bem", "nome do item", "equipamento", "material"]);
   addAliases("descricao", ["descricao", "descrição", "detalhamento", "observacao descritiva", "observação descritiva"]);
+  addAliases("observacoes", ["observacoes", "observações", "observacao", "observação", "obs", "obs."]);
   addAliases("categoria", ["categoria", "grupo", "classe", "familia", "família"]);
   addAliases("subcategoria", ["subcategoria", "sub categoria", "subgrupo", "sub grupo"]);
   addAliases("tipo_item", ["tipo", "tipo item", "tipo do item", "natureza"]);
@@ -455,7 +456,7 @@
     let best = null;
     const limit = Math.min(30, matrix.length);
     for (let index = 0; index < limit; index += 1) {
-      const fields = (matrix[index] || []).map(resolveHeader);
+      const fields = resolveSpreadsheetFields(matrix[index] || []);
       const unique = new Set(fields.filter(Boolean));
       let score = unique.size;
       if (unique.has("nome")) score += 2;
@@ -464,6 +465,25 @@
       if (!best || score > best.score) best = { index, fields, score };
     }
     return best;
+  }
+
+  function resolveSpreadsheetFields(headerRow) {
+    const normalized = headerRow.map(normalize);
+    const senaiPatrimonial = normalized.includes("entidade")
+      && normalized.includes("codigo")
+      && normalized.includes("descricao");
+
+    return headerRow.map(value => {
+      const key = normalize(value);
+
+      // Modelo patrimonial oficial utilizado na unidade:
+      // ENTIDADE | CÓDIGO | DESCRIÇÃO | STATUS | ... | LOCALIZAÇÃO
+      // Nesse formato, CÓDIGO é o número patrimonial e DESCRIÇÃO é o nome do bem.
+      if (senaiPatrimonial && key === "codigo") return "patrimonio";
+      if (senaiPatrimonial && key === "descricao") return "nome";
+
+      return resolveHeader(value);
+    });
   }
 
   async function parsePdf(file) {
@@ -612,17 +632,18 @@
       sourceLine: raw._sourceLine || number,
       sheet: raw._sheet || "",
       provided,
-      codigo_interno: clean(raw.codigo_interno),
-      patrimonio: clean(raw.patrimonio),
+      codigo_interno: cleanIdentifier(raw.codigo_interno),
+      patrimonio: cleanIdentifier(raw.patrimonio),
       nome: clean(raw.nome),
       descricao: clean(raw.descricao),
+      observacoes: clean(raw.observacoes),
       categoria: clean(raw.categoria),
       subcategoria: clean(raw.subcategoria),
       tipo_item: normalizeType(raw.tipo_item),
       marca: clean(raw.marca),
       modelo: clean(raw.modelo),
-      numero_serie: clean(raw.numero_serie),
-      codigo_barras: clean(raw.codigo_barras),
+      numero_serie: cleanIdentifier(raw.numero_serie),
+      codigo_barras: cleanIdentifier(raw.codigo_barras),
       quantidade: parseNumber(raw.quantidade),
       unidade: clean(raw.unidade),
       localizacao: clean(raw.localizacao),
@@ -646,6 +667,14 @@
       inferred: []
     };
 
+    if (!row.nome && row.descricao) {
+      row.nome = row.descricao;
+      row.inferred.push("nome=descrição");
+    }
+    if (!row.localizacao && normalize(row.sheet) === "senai lab") {
+      row.localizacao = "SENAI Lab";
+      row.inferred.push("localização=SENAI Lab");
+    }
     if (!row.nome) {
       row.action = "erro";
       row.error = "Nome/Descrição do bem não foi reconhecido.";
@@ -704,8 +733,8 @@
       const keys = identifierKeys(row);
       const duplicateKey = keys.find(key => seen.has(key));
       if (duplicateKey) {
-        row.action = "erro";
-        row.error = `Identificador duplicado no próprio arquivo (linha ${seen.get(duplicateKey)}).`;
+        row.action = "ignorar";
+        row.message = `Registro repetido no arquivo; a primeira ocorrência (linha ${seen.get(duplicateKey)}) será utilizada.`;
         continue;
       }
       keys.forEach(key => seen.set(key, row.number));
@@ -927,7 +956,7 @@
 
     if (!updating) {
       payload.criado_por = userId;
-      payload.observacoes = note;
+      payload.observacoes = [clean(row.observacoes), note].filter(Boolean).join("\n");
       const { data, error } = await db().from("inv_itens").insert(payload).select("id").single();
       if (error) throw error;
       return data.id;
@@ -935,7 +964,8 @@
 
     if (!existing?.id) throw new Error("Registro existente não encontrado para atualização.");
     const previousNotes = clean(existing.observacoes);
-    payload.observacoes = previousNotes.includes(note) ? previousNotes : [previousNotes, note].filter(Boolean).join("\n");
+    const importedNotes = row.provided.includes("observacoes") ? clean(row.observacoes) : "";
+    payload.observacoes = [...new Set([previousNotes, importedNotes, note].filter(Boolean))].join("\n");
     const { data, error } = await db().from("inv_itens").update(payload).eq("id", existing.id).select("id").single();
     if (error) throw error;
     return data.id;
@@ -1170,8 +1200,10 @@
     if (/arduino|esp32|raspberry/.test(text)) return "Arduino / Microcontroladores";
     if (/sensor/.test(text)) return "Sensores";
     if (/servo|motor|atuador|driver/.test(text)) return "Motores e Atuadores";
-    if (/multimetro|osciloscopio|fonte|eletronica/.test(text)) return "Eletrônica";
+    if (/transmissor|instrumentacao|instrumentação|pressao|pressão|termometro|termômetro|amperimetro|amperímetro|multimetro|multímetro|posicionador|calibracao|calibração|pneumatica|pneumática/.test(text)) return "Automação e Instrumentação";
+    if (/osciloscopio|osciloscópio|fonte|eletronica|eletrônica/.test(text)) return "Eletrônica";
     if (/notebook|computador|monitor|teclado|mouse|tablet/.test(text)) return "Informática";
+    if (/mesa|cadeira|banqueta|armario|armário|estante|bancada/.test(text)) return "Mobiliário";
     if (/furadeira|parafusadeira|chave|alicate|serra/.test(text)) return "Ferramentas";
     return "";
   }
@@ -1330,6 +1362,14 @@
 
   function clean(value) {
     return String(value ?? "").trim();
+  }
+
+  function cleanIdentifier(value) {
+    const text = clean(value);
+    if (!text) return "";
+    const key = normalize(text).replace(/[._-]+/g, " ").replace(/\s+/g, " ").trim();
+    if (["na", "n a", "n/a", "s/id", "s id", "sem id", "sem identificacao", "sem identificação", "-", "--"].includes(key)) return "";
+    return text;
   }
 
   function nullable(value) {
