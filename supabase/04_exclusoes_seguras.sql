@@ -42,6 +42,9 @@ $$;
 revoke execute on function public.inv_excluir_importacao(uuid) from public, anon;
 grant execute on function public.inv_excluir_importacao(uuid) to authenticated;
 
+-- A limpeza em massa dos itens importados está em 06_limpeza_itens_importados.sql.
+-- Ela fica separada para bancos já existentes ativarem o recurso sem reexecutar esta migration.
+
 commit;
 
 select
