@@ -1,0 +1,3 @@
+Patrimônio;Código interno;Descrição do Bem;Categoria;Tipo;Marca;Modelo;Número de Série;Quantidade;Unidade;Sala;Armário;Prateleira;Responsável;Status;Data Aquisição;Valor Unitário;Garantia até
+PAT-001;LAB-INV-0001;Osciloscópio;Eletrônica;Equipamento;Tektronix;TBS1102C;SN-001;1;un;Sala 02;Armário A;Prateleira 01;Equipe SENAI Lab;Disponível;15/02/2025;3500,00;15/02/2027
+PAT-002;LAB-INV-0002;Arduino UNO;Arduino / Microcontroladores;Componente;Arduino;UNO R3;;10;un;Sala 01;Armário B;Prateleira 02;Equipe SENAI Lab;Disponível;10/03/2025;120,00;
