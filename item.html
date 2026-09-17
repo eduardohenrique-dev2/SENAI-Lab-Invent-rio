@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#06379a">
+  <title>Item | SENAI Lab Inventário</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./css/tipografia-senai.css">
+  <link rel="stylesheet" href="./css/item-public.css">
+</head>
+<body>
+  <main class="public-shell">
+    <header class="public-brand">
+      <img src="./assets/logo-senai-lab.svg" alt="SENAI Lab">
+      <span>INVENTÁRIO</span>
+    </header>
+
+    <section id="itemLoading" class="public-state">
+      <div class="loader" aria-hidden="true"></div>
+      <h1>Consultando item...</h1>
+      <p>A ficha será carregada pelo código seguro do QR.</p>
+    </section>
+
+    <section id="itemError" class="public-state public-state--error" hidden>
+      <h1>Item não encontrado</h1>
+      <p id="itemErrorText">O QR Code é inválido ou o item não está mais ativo.</p>
+      <a class="public-button public-button--secondary" href="./">Abrir SENAI Lab Inventário</a>
+    </section>
+
+    <article id="itemCard" class="item-card" hidden>
+      <div class="item-hero">
+        <div id="itemPhotoWrap" class="item-photo" hidden>
+          <img id="itemPhoto" alt="Foto do item">
+        </div>
+        <div class="item-heading">
+          <span id="itemType" class="item-type">Equipamento</span>
+          <h1 id="itemName">Item</h1>
+          <p id="itemDescription">Consulta pública do patrimônio SENAI Lab.</p>
+        </div>
+      </div>
+
+      <div class="item-grid">
+        <div class="item-data"><span>Patrimônio</span><strong id="itemPatrimonio">—</strong></div>
+        <div class="item-data"><span>Código</span><strong id="itemCode">—</strong></div>
+        <div class="item-data"><span>Marca</span><strong id="itemBrand">—</strong></div>
+        <div class="item-data"><span>Modelo</span><strong id="itemModel">—</strong></div>
+        <div class="item-data"><span>Status</span><strong id="itemStatus" class="public-status">—</strong></div>
+        <div class="item-data"><span>Localização</span><strong id="itemLocation">—</strong></div>
+      </div>
+
+      <div class="item-actions">
+        <a id="itemLoanAction" class="public-button" href="./">Solicitar empréstimo</a>
+        <a id="itemMovementAction" class="public-button public-button--secondary" href="./">Transferir</a>
+        <a id="itemMaintenanceAction" class="public-button public-button--secondary" href="./">Manutenção</a>
+      </div>
+
+      <p class="privacy-note">Esta página exibe somente informações operacionais públicas do item. Valores, documentos fiscais, observações internas e dados de usuários não são publicados pelo QR Code.</p>
+    </article>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.115.0"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/item-public.js"></script>
+</body>
+</html>
