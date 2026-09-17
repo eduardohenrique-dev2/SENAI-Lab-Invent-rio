@@ -57,3 +57,43 @@
   .import-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .import-dropzone { min-height:160px; padding:18px 12px; }
 }
+
+
+/* Zona de limpeza em massa dos itens importados */
+.import-danger-zone{
+  border-color:#efc5c8;
+  background:linear-gradient(180deg,#fff,#fff9f9);
+}
+.import-danger-zone .panel-header{
+  align-items:center;
+  gap:18px;
+}
+.import-danger-zone .panel-header h2{color:#8f242b}
+.import-danger-zone .panel-header p{max-width:760px}
+.import-danger-zone__body{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  border-top:1px solid #f3d8da;
+}
+.import-danger-zone__body strong{
+  display:block;
+  color:#6f2026;
+  font-size:.76rem;
+}
+.import-danger-zone__body small{
+  display:block;
+  margin-top:4px;
+  color:var(--muted);
+  font-size:.67rem;
+  line-height:1.45;
+}
+.import-danger-zone .button--danger:disabled{
+  opacity:.48;
+  cursor:not-allowed;
+}
+@media(max-width:760px){
+  .import-danger-zone .panel-header{align-items:stretch}
+  .import-danger-zone .button--danger{width:100%}
+}
