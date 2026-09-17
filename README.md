@@ -55,7 +55,7 @@ Formatos aceitos:
 - `.csv`;
 - `.pdf` com texto selecionável.
 
-PDFs formados apenas por imagem/scan não são interpretados automaticamente. O sistema informa a limitação em vez de gerar dados que não estejam presentes no arquivo.
+PDFs formados apenas por imagem/scan não são interpretados automaticamente nesta versão. O sistema informa a limitação em vez de gerar dados que não estejam presentes no arquivo.
 
 A análise reconhece aliases comuns de colunas como patrimônio/tombamento, nome/descrição do bem, categoria, marca, modelo, número de série, quantidade, localização, sala, armário, prateleira, responsável, situação/status, aquisição, valor e garantia.
 
@@ -68,9 +68,13 @@ Antes de confirmar, cada linha recebe uma classificação:
 
 Duplicidades são comparadas por patrimônio, código interno, número de série e código de barras. Campos vazios do arquivo não apagam dados existentes.
 
+### Regra de preservação de código
+
+O importador V2 primeiro identifica duplicidades e somente depois gera códigos para registros novos. Em um item já existente, o `codigo_interno` só pode ser alterado quando o arquivo trouxer explicitamente uma coluna de código. Isso evita substituir códigos atuais por códigos gerados automaticamente durante uma atualização por patrimônio, série ou código de barras.
+
 Quando permitido pelo usuário, o importador também pode criar categorias e a hierarquia de localizações que ainda não existirem. Os arquivos originais ficam armazenados no bucket privado e cada lote registra totais de novos, atualizados, ignorados e erros.
 
-O repositório inclui `MODELO_IMPORTACAO_PATRIMONIO.csv` como referência opcional de colunas.
+O repositório inclui `modelos/modelo-importacao-patrimonio.csv` como referência opcional de colunas.
 
 ## Cadastro de item
 
@@ -131,12 +135,13 @@ A Project URL e a **Publishable Key** do Supabase podem aparecer no frontend. N�
 - `favicon.svg` — favicon SENAI Lab;
 - `js/config.js` — configuração pública do Supabase e carregamento dos módulos;
 - `js/app.js` — autenticação, permissões e módulos principais;
-- `js/importacoes.js` — leitura, prévia e importação de planilhas/PDFs;
+- `js/importacoes-v2.js` — leitura, prévia e importação segura de planilhas/PDFs;
+- `js/importacoes.js` — implementação anterior preservada apenas como histórico de desenvolvimento, sem carregamento na aplicação;
 - `js/item-public.js` — consulta pública segura do QR;
 - `supabase/01_inventario_schema.sql` — schema, RLS, RPCs, Storage e Realtime;
 - `supabase/02_seed_inicial.sql` — categorias, localização raiz e configurações iniciais;
 - `supabase/03_importacoes_uploads.sql` — lotes e histórico de uploads;
-- `MODELO_IMPORTACAO_PATRIMONIO.csv` — exemplo opcional de planilha;
+- `modelos/modelo-importacao-patrimonio.csv` — exemplo opcional de planilha;
 - `vercel.json` — headers de produção.
 
 ## Ativação
