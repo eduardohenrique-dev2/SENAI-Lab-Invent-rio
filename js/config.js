@@ -74,3 +74,23 @@ function obterInventarioSupabase() {
 
   return inventarioSupabaseClient;
 }
+
+/*
+ * Módulos complementares são carregados daqui para manter o index.html
+ * simples e permitir evoluções do sistema sem alterar a estrutura base.
+ */
+(function carregarModulosInventario() {
+  if (!document.querySelector('link[href="./css/importacoes.css"]')) {
+    const style = document.createElement("link");
+    style.rel = "stylesheet";
+    style.href = "./css/importacoes.css";
+    document.head.appendChild(style);
+  }
+
+  if (!document.querySelector('script[src="./js/importacoes.js"]')) {
+    const script = document.createElement("script");
+    script.src = "./js/importacoes.js";
+    script.defer = true;
+    document.head.appendChild(script);
+  }
+})();
