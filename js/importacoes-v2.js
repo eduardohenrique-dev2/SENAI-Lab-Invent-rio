@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "2.2.0";
+  const VERSION = "2.3.0";
   const CFG = {
     maxFiles: 10,
     maxFileSize: 20 * 1024 * 1024,
@@ -143,7 +143,7 @@
           <header class="panel-header"><div><h2>Regras da importação</h2><p>O sistema reconhece os itens, mas você confirma a prévia antes da gravação.</p></div></header>
           <div class="panel-body">
             <div class="import-options">
-              <div class="import-option"><label><input id="v2UpdateExisting" type="checkbox" checked> Atualizar itens existentes</label><small>Reconhecimento por patrimônio, código, número de série ou código de barras. Campos vazios nunca apagam dados atuais.</small></div>
+              <div class="import-option"><label><input id="v2UpdateExisting" type="checkbox" checked disabled> Reimportar itens existentes</label><small>A mesma planilha pode ser enviada quantas vezes quiser. Itens existentes são atualizados e itens baixados pela limpeza podem ser reativados.</small></div>
               <div class="import-option"><label><input id="v2CreateLocations" type="checkbox" checked> Criar localizações ausentes</label><small>Monta Sala → Armário → Prateleira abaixo do SENAI Lab quando essas informações estiverem no arquivo.</small></div>
               <div class="import-option"><label><input id="v2CreateCategories" type="checkbox" checked> Criar categorias ausentes</label><small>Categorias reconhecidas no arquivo podem ser criadas automaticamente.</small></div>
             </div>
@@ -408,7 +408,7 @@
 
   async function loadReferences() {
     const [items, categories, locations, settings] = await Promise.all([
-      fetchAll("inv_itens", "*", query => query.eq("ativo", true).order("nome")),
+      fetchAll("inv_itens", "*", query => query.order("nome")),
       fetchAll("inv_categorias", "*", query => query.eq("ativo", true).order("nome")),
       fetchAll("inv_localizacoes", "*", query => query.eq("ativo", true).order("nome")),
       db().from("inv_configuracoes").select("chave,valor").eq("chave", "geral").maybeSingle()
@@ -683,7 +683,8 @@
       existingItem: null,
       error: "",
       message: "",
-      inferred: []
+      inferred: [],
+      reactivate: false
     };
 
     if (!row.nome && row.descricao) {
@@ -724,7 +725,6 @@
 
   function classifyRows() {
     const index = buildExistingIndex();
-    const updateExisting = Boolean($("v2UpdateExisting")?.checked);
     const seen = new Map();
 
     for (const row of state.rows) {
@@ -743,8 +743,11 @@
 
       if (matches.size === 1) {
         row.existingItem = [...matches][0];
-        row.action = updateExisting ? "atualizar" : "ignorar";
-        row.message = updateExisting ? `Atualizará ${row.existingItem.nome}.` : "Item já existe; atualização desativada.";
+        row.reactivate = row.existingItem.ativo === false;
+        row.action = "atualizar";
+        row.message = row.reactivate
+          ? `Reativará ${row.existingItem.nome} e aplicará novamente os dados desta planilha.`
+          : `Reimportará ${row.existingItem.nome} atualizando os dados reconhecidos.`;
         if (!row.provided.includes("codigo_interno")) row.codigo_interno = row.existingItem.codigo_interno || "";
         continue;
       }
@@ -1026,6 +1029,13 @@
     set("data_aquisicao", row.data_aquisicao);
     set("valor_unitario", row.valor_unitario);
     set("garantia_ate", row.garantia_ate);
+
+    if (updating && row.reactivate) {
+      payload.ativo = true;
+      payload.status = row.status || "disponivel";
+      payload.quantidade = Number.isFinite(row.quantidade) ? row.quantidade : Math.max(Number(row.existingItem?.quantidade || 1), 1);
+    }
+
     return payload;
   }
 
@@ -1256,7 +1266,8 @@
 
   function optionsSnapshot() {
     return {
-      atualizar_existentes: Boolean($("v2UpdateExisting")?.checked),
+      atualizar_existentes: true,
+      reimportacao_automatica: true,
       criar_localizacoes: Boolean($("v2CreateLocations")?.checked),
       criar_categorias: Boolean($("v2CreateCategories")?.checked)
     };
