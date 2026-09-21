@@ -229,19 +229,14 @@
 
     const email = String($("loginEmail")?.value || "").trim();
     const password = String($("loginPassword")?.value || "");
-    const captchaToken = getCaptchaToken();
     const button = $("btnLogin");
 
     hideLoginError();
-    if (!captchaToken) {
-      showLoginError("Confirme a verificação de segurança antes de entrar.");
-      return;
-    }
-
     button.disabled = true;
     button.textContent = "Entrando...";
 
     try {
+      const captchaToken = await window.inventoryCaptcha.getToken();
       const { data, error } = await client().auth.signInWithPassword({
         email,
         password,
@@ -252,7 +247,7 @@
     } catch (error) {
       console.error("Falha no login:", error);
       showLoginError("Não foi possível entrar. Confira seus dados, sua permissão e refaça a verificação de segurança.");
-      try { window.hcaptcha?.reset(); } catch (_) {}
+      window.inventoryCaptcha?.reset();
     } finally {
       button.disabled = false;
       button.textContent = "Entrar no sistema";
