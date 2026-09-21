@@ -76,6 +76,7 @@
   const state = {
     user: null,
     profile: null,
+    portal: { view: false, admin: false },
     items: [],
     categories: [],
     locations: [],
@@ -283,8 +284,39 @@
       return;
     }
 
+    const accessState = await client().rpc("portal_estado_acesso");
+    if (accessState.error) throw accessState.error;
+
+    const accessRow = Array.isArray(accessState.data) ? accessState.data[0] : null;
+    if (accessRow?.must_change_password === true) {
+      window.location.replace("https://portal-afonso-greco.vercel.app/primeiro-acesso.html");
+      return;
+    }
+
+    const [viewPermission, adminPermission] = await Promise.all([
+      client().rpc("portal_has_permission", {
+        p_permission_key: "inventario.visualizar"
+      }),
+      client().rpc("portal_has_permission", {
+        p_permission_key: "inventario.administrar"
+      })
+    ]);
+
+    if (viewPermission.error) throw viewPermission.error;
+    if (adminPermission.error) throw adminPermission.error;
+
+    if (viewPermission.data !== true) {
+      await client().auth.signOut();
+      showLoginError("Sua conta não possui permissão para acessar o SENAI Lab Inventário.");
+      return;
+    }
+
     state.user = user;
     state.profile = profile;
+    state.portal = {
+      view: true,
+      admin: adminPermission.data === true
+    };
     $("loginScreen").hidden = true;
     $("appShell").hidden = false;
     $("userName").textContent = profile.nome || profile.email || "Usuário";
@@ -313,6 +345,7 @@
     clearTimeout(state.reloadTimer);
     state.user = null;
     state.profile = null;
+    state.portal = { view: false, admin: false };
     state.realtimeChannel = null;
     $("appShell").hidden = true;
     $("loginScreen").hidden = false;
@@ -348,11 +381,32 @@
     showView(state.currentView);
   }
 
-  function isAdmin() { return state.profile?.papel === "administrador"; }
-  function canManage() { return ["administrador", "gestor"].includes(state.profile?.papel); }
-  function canOperate() { return ["administrador", "gestor", "instrutor"].includes(state.profile?.papel); }
-  function canAudit() { return ["administrador", "gestor", "auditor"].includes(state.profile?.papel); }
-  function canReport() { return ["administrador", "gestor", "auditor"].includes(state.profile?.papel); }
+  function isAdmin() {
+    return state.portal.admin && state.profile?.papel === "administrador";
+  }
+
+  function canManage() {
+    return state.portal.admin &&
+      ["administrador", "gestor"].includes(state.profile?.papel);
+  }
+
+  function canOperate() {
+    if (!state.portal.view) return false;
+    if (state.profile?.papel === "instrutor") return true;
+    return state.portal.admin &&
+      ["administrador", "gestor"].includes(state.profile?.papel);
+  }
+
+  function canAudit() {
+    if (!state.portal.view) return false;
+    if (state.profile?.papel === "auditor") return true;
+    return state.portal.admin &&
+      ["administrador", "gestor"].includes(state.profile?.papel);
+  }
+
+  function canReport() {
+    return canAudit();
+  }
 
   async function loadAll({ silent = false } = {}) {
     if (!state.user || state.loading) return;
