@@ -12,6 +12,15 @@
     try{
       const supabase=client();
       if(!supabase) return;
+      const accessState=await supabase.rpc("portal_estado_acesso");
+      if(!accessState.error){
+        const row=Array.isArray(accessState.data)?accessState.data[0]:null;
+        if(row?.must_change_password===true){
+          window.location.replace("https://portal-afonso-greco.vercel.app/primeiro-acesso.html");
+          return;
+        }
+      }
+
       const {data,error}=await supabase.rpc("portal_pode_modulo",{p_modulo_chave:MODULE_KEY});
       if(error){
         if(/portal_pode_modulo|could not find the function|does not exist/i.test(String(error.message||error))) return;
