@@ -34,7 +34,9 @@
           <input id="loginPassword" name="password" type="password" autocomplete="current-password" required minlength="8" maxlength="256">
         </div>
 
-        <div class="h-captcha" data-sitekey="99b6aeca-0a42-4d56-b8be-06f0e2c068f6"></div>
+        <a class="login-reset-link" href="https://portal-afonso-greco.vercel.app/esqueci-senha.html">Esqueci / redefinir minha senha</a>
+        <div id="inventoryLoginCaptcha" class="h-captcha" aria-label="Verificação de segurança"></div>
+        <p id="inventoryCaptchaStatus" class="login-captcha-status" role="status"></p>
         <p id="loginError" class="login-error" hidden></p>
         <button id="btnLogin" class="button" type="submit" style="width:100%">Entrar no sistema</button>
         <p class="login-help">O acesso combina as permissões do Portal Afonso Greco com o perfil interno do Inventário.</p>
@@ -87,6 +89,7 @@
             <strong id="userName">Usuário</strong>
             <span id="userRole">Perfil</span>
           </div>
+          <a class="icon-button" href="https://portal-afonso-greco.vercel.app/esqueci-senha.html" title="Redefinir senha" aria-label="Redefinir senha">⌁</a>
           <button id="btnLogout" class="icon-button" type="button" title="Sair">↪</button>
         </div>
       </div>
@@ -368,13 +371,14 @@
   <div id="toastStack" class="toast-stack" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.115.0"></script>
-  <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+  <script src="./js/captcha-trust.js?v=20260921-captcha5m1"></script>
+  <script src="https://js.hcaptcha.com/1/api.js?onload=inventarioCaptchaInit&amp;render=explicit" async defer></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
   <script src="./js/config.js"></script>
-  <script src="./js/app.js?v=20260921-rbac1"></script>
+  <script src="./js/app.js?v=20260921-captcha5m1"></script>
   <script src="./js/portal-module-gate.js?v=20260921-rbac1"></script>
   <script src="./js/logo-home.js?v=20260918-1"></script>
 </body>
