@@ -5,6 +5,7 @@
   const TRUST_MS=5*60*1000;
   const TRUST_KEY="inventario-hcaptcha-trusted-until";
   let widgetId=null;
+  let widgetMode="visible";
 
   function apiReady(){
     return typeof window.hcaptcha?.render==="function";
@@ -37,6 +38,7 @@
     const invisible=trusted();
 
     try{
+      widgetMode=invisible?"invisible":"visible";
       widgetId=window.hcaptcha.render(container,{
         sitekey:SITE_KEY,
         size:invisible
@@ -84,6 +86,7 @@
     if(existing)return existing;
 
     if(!trusted()){
+      if(widgetMode==="invisible")rerenderVisible();
       throw new Error("Confirme a verificação de segurança antes de entrar.");
     }
 
@@ -95,8 +98,27 @@
       return token;
     }catch(error){
       console.warn("hCaptcha automático do Inventário:",error);
+      clearTrust();
+      rerenderVisible();
       throw new Error("A verificação automática não foi concluída. Confirme o desafio para continuar.");
     }
+  }
+
+  function clearTrust(){
+    try{sessionStorage.removeItem(TRUST_KEY);}catch(_){}
+  }
+
+  function rerenderVisible(){
+    if(widgetId===null||!apiReady()||typeof window.hcaptcha.remove!=="function")return;
+    const container=document.getElementById("inventoryLoginCaptcha");
+    if(!container)return;
+    try{
+      window.hcaptcha.remove(widgetId);
+      widgetId=null;
+      widgetMode="visible";
+      container.replaceChildren();
+      render();
+    }catch(_){}
   }
 
   function reset(){
