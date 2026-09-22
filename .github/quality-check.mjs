@@ -40,6 +40,14 @@ function checkFile(file){
     if(executable&&/@supabase\/supabase-js@2(?:["'\/]|\))/i.test(line)){
       findings.push(`${rel}:${index+1} Supabase JS sem versão exata`);
     }
+
+    if(/xlsx@0\.18\.5|pdfjs-dist@3\.11\.174|jspdf@2\.5\.2/i.test(line)){
+      findings.push(`${rel}:${index+1} dependência bloqueada por hardening de segurança`);
+    }
+
+    if(executable&&/api\.qrserver\.com/i.test(line)){
+      findings.push(`${rel}:${index+1} QR externo bloqueado; gere o QR localmente`);
+    }
   });
 
   if(file.endsWith(".sql")){
