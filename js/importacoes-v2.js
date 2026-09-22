@@ -6,8 +6,8 @@
     maxFiles: 10,
     maxFileSize: 20 * 1024 * 1024,
     maxRows: 10000,
-    pdfJsUrl: "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js",
-    pdfWorkerUrl: "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
+    pdfJsUrl: "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.3.289/build/pdf.mjs",
+    pdfWorkerUrl: "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.3.289/build/pdf.worker.mjs"
   };
 
   const state = {
@@ -617,30 +617,19 @@
       window.pdfjsLib.GlobalWorkerOptions.workerSrc = CFG.pdfWorkerUrl;
       return;
     }
-    await loadScript(CFG.pdfJsUrl);
-    if (!window.pdfjsLib) throw new Error("Leitor de PDF não carregado.");
-    window.pdfjsLib.GlobalWorkerOptions.workerSrc = CFG.pdfWorkerUrl;
-  }
 
-  function loadScript(src) {
-    return new Promise((resolve, reject) => {
-      const current = document.querySelector(`script[src="${src}"]`);
-      if (current) {
-        if (current.dataset.ready === "true") return resolve();
-        current.addEventListener("load", resolve, { once: true });
-        current.addEventListener("error", () => reject(new Error("Falha ao carregar leitor de PDF.")), { once: true });
-        return;
-      }
-      const script = document.createElement("script");
-      script.src = src;
-      script.async = true;
-      script.addEventListener("load", () => {
-        script.dataset.ready = "true";
-        resolve();
-      }, { once: true });
-      script.addEventListener("error", () => reject(new Error("Falha ao carregar leitor de PDF.")), { once: true });
-      document.head.appendChild(script);
-    });
+    try {
+      window.pdfjsLib = await import(CFG.pdfJsUrl);
+    } catch (error) {
+      console.error("Falha ao carregar PDF.js:", error);
+      throw new Error("Falha ao carregar leitor de PDF.");
+    }
+
+    if (!window.pdfjsLib?.getDocument) {
+      throw new Error("Leitor de PDF não carregado.");
+    }
+
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = CFG.pdfWorkerUrl;
   }
 
   function prepareRow(raw, sourceName, number) {
