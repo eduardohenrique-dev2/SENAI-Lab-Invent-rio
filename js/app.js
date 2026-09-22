@@ -15,6 +15,32 @@
     throw new Error("InventoryDomain não foi carregado.");
   }
 
+  const {
+    normalize,
+    clean,
+    nullable,
+    numberValue,
+    nullableNumber,
+    formatNumber,
+    formatCurrency,
+    formatDate,
+    formatDateTime,
+    daysUntil,
+    normalizeError,
+    safeFileName,
+    shortId,
+    todayIso,
+    slug,
+    csvValue,
+    downloadBlob,
+    escapeHtml,
+    cssEscape
+  }=window.InventoryUtils||{};
+
+  if(!window.InventoryUtils){
+    throw new Error("InventoryUtils não foi carregado.");
+  }
+
   const state = {
     user: null,
     profile: null,
@@ -1790,82 +1816,4 @@
   function setHidden(id, hidden) { const el = $(id); if (el) el.hidden = hidden; }
   function setBadge(id, value) { const el = $(id); if (!el) return; el.textContent = String(value); el.hidden = !value; }
 
-  function normalize(value) {
-    return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-  }
-
-  function clean(value) { return String(value ?? "").trim(); }
-  function nullable(value) { const v = clean(value); return v === "" ? null : v; }
-  function numberValue(value, fallback = 0) { const n = Number(value); return Number.isFinite(n) ? n : fallback; }
-  function nullableNumber(value) { const v = clean(value); if (!v) return null; const n = Number(v); return Number.isFinite(n) ? n : null; }
-
-  function formatNumber(value) {
-    const number = Number(value || 0);
-    return new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 3 }).format(number);
-  }
-
-  function formatCurrency(value) {
-    return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(value || 0));
-  }
-
-  function formatDate(value) {
-    if (!value) return "—";
-    const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})/);
-    if (match) return `${match[3]}/${match[2]}/${match[1]}`;
-    const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? "—" : date.toLocaleDateString("pt-BR");
-  }
-
-  function formatDateTime(value) {
-    if (!value) return "—";
-    const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? "—" : date.toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
-  }
-
-  function daysUntil(value) {
-    if (!value) return NaN;
-    const date = new Date(`${String(value).slice(0, 10)}T12:00:00`);
-    const today = new Date();
-    today.setHours(12, 0, 0, 0);
-    return Math.ceil((date.getTime() - today.getTime()) / 86400000);
-  }
-
-  function normalizeError(error) {
-    const message = String(error?.message || error || "Erro inesperado.");
-    if (/row-level security/i.test(message)) return "Seu perfil não possui permissão para esta operação.";
-    if (/duplicate key|unique constraint/i.test(message)) return "Já existe um registro com este código, patrimônio, série ou identificador.";
-    if (/does not exist|relation/i.test(message)) return "O banco do Inventário ainda não foi ativado ou está incompleto.";
-    return message;
-  }
-
-  function safeFileName(name) { return String(name || "arquivo").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9._-]+/g, "-").replace(/-+/g, "-").slice(0, 100); }
-  function shortId(value) { const v = String(value || ""); return v.length > 12 ? `${v.slice(0, 8)}…` : v || "—"; }
-  function todayIso() { return new Date().toISOString().slice(0, 10); }
-  function slug(value) { return normalize(value).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "relatorio"; }
-
-  function csvValue(value) {
-    let text = String(value ?? "");
-    if (/^[=+\-@]/.test(text)) text = `'${text}`;
-    return `"${text.replace(/"/g, '""')}"`;
-  }
-
-  function downloadBlob(blob, filename) {
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-  }
-
-  function escapeHtml(value) {
-    return String(value ?? "").replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
-  }
-
-  function cssEscape(value) {
-    if (window.CSS?.escape) return window.CSS.escape(String(value));
-    return String(value).replace(/[^a-zA-Z0-9_-]/g, "\\$&");
-  }
 })();
