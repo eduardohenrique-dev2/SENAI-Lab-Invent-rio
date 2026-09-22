@@ -71,7 +71,10 @@ test("skip link recebe foco pelo teclado",async({page})=>{
 
   const skip=page.locator(".skip-link");
   await expect(skip).toHaveCount(1);
-  await expect(page.locator("#mainContent")).toHaveCount(1);
+
+  const target=await skip.getAttribute("href");
+  expect(target).toMatch(/^#[A-Za-z][A-Za-z0-9_-]*$/);
+  await expect(page.locator(target)).toHaveCount(1);
 
   await page.keyboard.press("Tab");
   await expect(skip).toBeFocused();
