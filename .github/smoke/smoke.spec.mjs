@@ -46,7 +46,7 @@ test("shell principal renderiza sem recurso local quebrado",async({page})=>{
   });
 
   await expect(page.locator("body")).toBeVisible();
-  await expect(page.locator("#loginView")).toHaveCount(1);
+  await expect(page.locator("#loginScreen")).toHaveCount(1);
 
   // Dá tempo para scripts defer e recursos locais terminarem de carregar.
   await page.waitForTimeout(800);
