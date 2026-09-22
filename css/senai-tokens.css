@@ -1,13 +1,20 @@
 :root{
-  /* Marca SENAI / Afonso Greco */
+  /* ==========================================================
+     SENAI / Afonso Greco — Design Tokens compartilhados
+     Fonte única de verdade para os quatro sistemas.
+     ========================================================== */
+
+  /* Marca */
   --senai-brand-blue:#0f5ba8;
   --senai-brand-blue-strong:#06379a;
   --senai-brand-blue-dark:#004b87;
+  --senai-brand-navy:#10203a;
   --senai-brand-orange:#f5a623;
   --senai-brand-red:#e5654c;
 
   /* Texto e superfícies */
   --senai-ink:#14263b;
+  --senai-text:var(--senai-ink);
   --senai-muted:#66798c;
   --senai-bg:#f3f6f9;
   --senai-surface:#ffffff;
@@ -19,22 +26,45 @@
   --senai-warning:#e9a521;
   --senai-danger:#d83f46;
 
+  /* Tipografia */
+  --senai-font-ui:Inter,"Segoe UI",Arial,sans-serif;
+  --senai-font-brand:"Neo Sans Pro Local","Neo Sans Pro",Barlow,Inter,Arial,sans-serif;
+
+  /* Espaçamento */
+  --senai-space-1:4px;
+  --senai-space-2:8px;
+  --senai-space-3:12px;
+  --senai-space-4:16px;
+  --senai-space-5:20px;
+  --senai-space-6:24px;
+  --senai-space-8:32px;
+  --senai-space-10:40px;
+
   /* Geometria */
   --senai-radius-sm:10px;
   --senai-radius-md:14px;
   --senai-radius-lg:20px;
+  --senai-radius-pill:999px;
 
   /* Elevação */
   --senai-shadow-sm:0 8px 24px rgba(23,52,80,.08);
   --senai-shadow-md:0 18px 54px rgba(16,36,64,.10);
   --senai-shadow-lg:0 28px 80px rgba(8,43,76,.14);
+  --senai-shadow:0 18px 48px rgba(22,42,69,.10);
 
   /* Foco acessível */
-  --senai-focus:0 0 0 3px rgba(15,91,168,.18);
+  --senai-focus:#f5a623;
+  --senai-focus-ring:0 0 0 4px rgba(245,166,35,.24);
+
+  /* Movimento */
+  --senai-motion-fast:140ms;
+  --senai-motion-base:180ms;
+  --senai-motion-slow:260ms;
 }
 
 html[data-theme="dark"]{
   --senai-ink:#edf4fb;
+  --senai-text:var(--senai-ink);
   --senai-muted:#a6b5c7;
   --senai-bg:#0d141d;
   --senai-surface:#141e29;
@@ -43,4 +73,5 @@ html[data-theme="dark"]{
   --senai-shadow-sm:0 8px 24px rgba(0,0,0,.22);
   --senai-shadow-md:0 18px 54px rgba(0,0,0,.28);
   --senai-shadow-lg:0 28px 80px rgba(0,0,0,.36);
+  --senai-shadow:0 18px 48px rgba(0,0,0,.28);
 }
