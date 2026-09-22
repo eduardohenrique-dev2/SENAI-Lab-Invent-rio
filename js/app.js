@@ -97,6 +97,9 @@
     dashboard: {},
     currentView: "dashboard",
     currentPhysicalId: null,
+    itemPage: 1,
+    itemPageSize: 50,
+    itemRenderTimer: null,
     realtimeChannel: null,
     reloadTimer: null,
     fallbackTimer: null,
@@ -175,17 +178,45 @@
   }
 
   function bindFilters() {
-    $("itemSearch")?.addEventListener("input", renderItems);
-    $("itemTypeFilter")?.addEventListener("change", renderItems);
-    $("itemStatusFilter")?.addEventListener("change", renderItems);
-    $("itemLocationFilter")?.addEventListener("change", renderItems);
+    $("itemSearch")?.addEventListener("input", () => {
+      state.itemPage = 1;
+      scheduleItemRender();
+    });
+    $("itemTypeFilter")?.addEventListener("change", () => {
+      state.itemPage = 1;
+      renderItems();
+    });
+    $("itemStatusFilter")?.addEventListener("change", () => {
+      state.itemPage = 1;
+      renderItems();
+    });
+    $("itemLocationFilter")?.addEventListener("change", () => {
+      state.itemPage = 1;
+      renderItems();
+    });
     $("btnClearItemFilters")?.addEventListener("click", () => {
       $("itemSearch").value = "";
       $("itemTypeFilter").value = "";
       $("itemStatusFilter").value = "";
       $("itemLocationFilter").value = "";
+      state.itemPage = 1;
       renderItems();
     });
+
+    $("itemsPrevPage")?.addEventListener("click", () => {
+      if (state.itemPage <= 1) return;
+      state.itemPage -= 1;
+      renderItems();
+      $("itemsTableBody")?.closest(".table-wrap")?.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    $("itemsNextPage")?.addEventListener("click", () => {
+      state.itemPage += 1;
+      renderItems();
+      $("itemsTableBody")?.closest(".table-wrap")?.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    $("itemsTableBody")?.addEventListener("click", handleItemTableClick);
 
     $("loanSearch")?.addEventListener("input", renderLoans);
     $("loanStatusFilter")?.addEventListener("change", renderLoans);
@@ -553,6 +584,11 @@
     }
   }
 
+  function scheduleItemRender() {
+    clearTimeout(state.itemRenderTimer);
+    state.itemRenderTimer = setTimeout(renderItems, 160);
+  }
+
   function renderItems() {
     const tbody = $("itemsTableBody");
     if (!tbody) return;
@@ -562,7 +598,7 @@
     const status = $("itemStatusFilter")?.value || "";
     const location = $("itemLocationFilter")?.value || "";
 
-    const rows = state.items.filter(item => {
+    const filteredRows = state.items.filter(item => {
       if (type && item.tipo_item !== type) return false;
       if (status && item.status !== status) return false;
       if (location && String(item.localizacao_id || "") !== location) return false;
@@ -573,6 +609,22 @@
       ].filter(Boolean).join(" "));
       return haystack.includes(search);
     });
+
+    const totalPages = Math.max(1, Math.ceil(filteredRows.length / state.itemPageSize));
+    state.itemPage = Math.min(Math.max(1, state.itemPage), totalPages);
+
+    const start = (state.itemPage - 1) * state.itemPageSize;
+    const rows = filteredRows.slice(start, start + state.itemPageSize);
+
+    setText("itemsPaginationInfo",
+      filteredRows.length
+        ? `${start + 1}–${Math.min(start + rows.length, filteredRows.length)} de ${filteredRows.length} itens`
+        : "0 itens"
+    );
+    setText("itemsPageLabel", `Página ${state.itemPage} de ${totalPages}`);
+
+    if ($("itemsPrevPage")) $("itemsPrevPage").disabled = state.itemPage <= 1;
+    if ($("itemsNextPage")) $("itemsNextPage").disabled = state.itemPage >= totalPages;
 
     tbody.replaceChildren();
     if (!rows.length) return appendEmptyRow(tbody, 8, "Nenhum item encontrado.");
@@ -597,15 +649,37 @@
         <td><div class="table-actions">${actionButtons.join("")}</div></td>`;
       tbody.appendChild(tr);
     });
+  }
 
-    tbody.querySelectorAll("[data-item-edit]").forEach(btn => btn.addEventListener("click", () => openItemModal(findItem(btn.dataset.itemEdit))));
-    tbody.querySelectorAll("[data-item-history]").forEach(btn => btn.addEventListener("click", () => openHistory(btn.dataset.itemHistory)));
-    tbody.querySelectorAll("[data-item-qr]").forEach(btn => btn.addEventListener("click", () => {
+  function handleItemTableClick(event) {
+    const button = event.target.closest("button");
+    if (!button) return;
+
+    const editId = button.dataset.itemEdit;
+    const historyId = button.dataset.itemHistory;
+    const qrId = button.dataset.itemQr;
+    const loanId = button.dataset.itemLoan;
+
+    if (editId) {
+      openItemModal(findItem(editId));
+      return;
+    }
+
+    if (historyId) {
+      openHistory(historyId);
+      return;
+    }
+
+    if (qrId) {
       showView("qrcode");
-      $("qrItemSelect").value = btn.dataset.itemQr;
+      $("qrItemSelect").value = qrId;
       renderSelectedQr();
-    }));
-    tbody.querySelectorAll("[data-item-loan]").forEach(btn => btn.addEventListener("click", () => openLoanModal(btn.dataset.itemLoan)));
+      return;
+    }
+
+    if (loanId) {
+      openLoanModal(loanId);
+    }
   }
 
   function renderStock() {
