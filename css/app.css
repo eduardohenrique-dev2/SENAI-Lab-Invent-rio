@@ -1,18 +1,18 @@
 :root {
-  --senai-blue: #06379a;
-  --senai-blue-2: #0f5ba8;
+  --senai-blue: var(--senai-brand-blue-strong);
+  --senai-blue-2: var(--senai-brand-blue);
   --senai-blue-soft: #eaf3ff;
-  --senai-orange: #f68b00;
-  --ink: #14263b;
-  --muted: #66798c;
-  --line: #dce5ed;
-  --surface: #ffffff;
-  --bg: #f3f6f9;
+  --senai-orange: var(--senai-brand-orange);
+  --ink: var(--senai-ink);
+  --muted: var(--senai-muted);
+  --line: var(--senai-line);
+  --surface: var(--senai-surface);
+  --bg: var(--senai-bg);
   --success: #087544;
   --warning: #986400;
   --danger: #b12d34;
-  --radius: 14px;
-  --shadow: 0 10px 28px rgba(23, 52, 80, .08);
+  --radius: var(--senai-radius-md);
+  --shadow: var(--senai-shadow-sm);
 }
 
 * { box-sizing: border-box; }
