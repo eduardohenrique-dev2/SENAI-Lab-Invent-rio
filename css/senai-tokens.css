@@ -1,0 +1,46 @@
+:root{
+  /* Marca SENAI / Afonso Greco */
+  --senai-brand-blue:#0f5ba8;
+  --senai-brand-blue-strong:#06379a;
+  --senai-brand-blue-dark:#004b87;
+  --senai-brand-orange:#f5a623;
+  --senai-brand-red:#e5654c;
+
+  /* Texto e superfícies */
+  --senai-ink:#14263b;
+  --senai-muted:#66798c;
+  --senai-bg:#f3f6f9;
+  --senai-surface:#ffffff;
+  --senai-surface-soft:#eef3f8;
+  --senai-line:#dce5ed;
+
+  /* Estados */
+  --senai-success:#12a56a;
+  --senai-warning:#e9a521;
+  --senai-danger:#d83f46;
+
+  /* Geometria */
+  --senai-radius-sm:10px;
+  --senai-radius-md:14px;
+  --senai-radius-lg:20px;
+
+  /* Elevação */
+  --senai-shadow-sm:0 8px 24px rgba(23,52,80,.08);
+  --senai-shadow-md:0 18px 54px rgba(16,36,64,.10);
+  --senai-shadow-lg:0 28px 80px rgba(8,43,76,.14);
+
+  /* Foco acessível */
+  --senai-focus:0 0 0 3px rgba(15,91,168,.18);
+}
+
+html[data-theme="dark"]{
+  --senai-ink:#edf4fb;
+  --senai-muted:#a6b5c7;
+  --senai-bg:#0d141d;
+  --senai-surface:#141e29;
+  --senai-surface-soft:#1b2836;
+  --senai-line:#29394a;
+  --senai-shadow-sm:0 8px 24px rgba(0,0,0,.22);
+  --senai-shadow-md:0 18px 54px rgba(0,0,0,.28);
+  --senai-shadow-lg:0 28px 80px rgba(0,0,0,.36);
+}
