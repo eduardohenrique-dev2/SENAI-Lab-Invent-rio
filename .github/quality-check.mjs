@@ -21,7 +21,6 @@ function checkFile(file){
   const rel=path.relative(root,file).replaceAll("\\","/");
   const content=fs.readFileSync(file,"utf8");
   const lines=content.split(/\r?\n/);
-
   const executable=/\.(?:html|js|mjs|ts)$/i.test(file);
 
   lines.forEach((line,index)=>{
@@ -50,6 +49,18 @@ function checkFile(file){
     }
   });
 
+  if(file.endsWith(".css")&&!rel.endsWith("css/senai-tokens.css")){
+    const tokenDeclaration=/--senai-(?:brand-(?:blue|blue-strong|blue-dark|navy|orange|red)|ink|text|muted|bg|surface|surface-soft|line|success|warning|danger|radius-(?:sm|md|lg|pill)|shadow(?:-(?:sm|md|lg))?|focus|focus-ring)\s*:/;
+
+    lines.forEach((line,index)=>{
+      if(tokenDeclaration.test(line)){
+        findings.push(
+          `${rel}:${index+1} token visual compartilhado redefinido fora de css/senai-tokens.css`
+        );
+      }
+    });
+  }
+
   if(file.endsWith(".html")){
     const ids=[...content.matchAll(/\bid=["']([^"']+)["']/g)]
       .map(match=>match[1]);
@@ -60,6 +71,25 @@ function checkFile(file){
     if(duplicates.length){
       findings.push(
         `${rel}: IDs HTML duplicados: ${duplicates.join(", ")}`
+      );
+    }
+
+    const foundationIndex=content.indexOf("senai-foundation.css");
+    const tokensIndex=content.indexOf("senai-tokens.css");
+
+    if(foundationIndex>=0&&tokensIndex<0){
+      findings.push(
+        `${rel}: senai-foundation.css exige senai-tokens.css`
+      );
+    }
+
+    if(
+      foundationIndex>=0 &&
+      tokensIndex>=0 &&
+      tokensIndex>foundationIndex
+    ){
+      findings.push(
+        `${rel}: carregue senai-tokens.css antes de senai-foundation.css`
       );
     }
   }
@@ -83,4 +113,4 @@ if(findings.length){
   process.exit(1);
 }
 
-console.log("Quality Gate: sintaxe/política de segurança sem achados bloqueantes.");
+console.log("Quality Gate: sintaxe/política de segurança/design system sem achados bloqueantes.");
