@@ -117,6 +117,20 @@
     bindFilters();
     bindForms();
     bindButtons();
+
+    document.querySelectorAll(".modal form").forEach(form=>{
+      form.addEventListener("input",()=>{form.dataset.dirty="true";});
+      form.addEventListener("change",()=>{form.dataset.dirty="true";});
+      form.addEventListener("reset",()=>{delete form.dataset.dirty;});
+    });
+
+    window.addEventListener("beforeunload",event=>{
+      const dirty=[...document.querySelectorAll(".modal form[data-dirty='true']")]
+        .some(form=>!form.closest(".modal-backdrop")?.hidden);
+      if(!dirty)return;
+      event.preventDefault();
+      event.returnValue="";
+    });
   }
 
   function bindFilters() {
@@ -956,6 +970,8 @@
 
   function closeModal(id) {
     const modal = $(id);
+    const form = modal?.querySelector("form");
+    if (form) delete form.dataset.dirty;
     if (modal) modal.hidden = true;
   }
 
