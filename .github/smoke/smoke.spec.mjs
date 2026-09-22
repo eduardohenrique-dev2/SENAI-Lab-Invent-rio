@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
 const baseURL=process.env.BASE_URL||"http://127.0.0.1:4173";
 const criticalRoutes=[
@@ -59,4 +60,40 @@ test("página 404 customizada existe",async({request})=>{
   expect(response.status()).toBe(200);
   const html=await response.text();
   expect(html).toContain("Página não encontrada");
+});
+
+
+test("skip link recebe foco pelo teclado",async({page})=>{
+  await page.goto(baseURL+"/index.html",{
+    waitUntil:"domcontentloaded",
+    timeout:20000
+  });
+
+  const skip=page.locator(".skip-link");
+  await expect(skip).toHaveCount(1);
+  await expect(page.locator("#mainContent")).toHaveCount(1);
+
+  await page.keyboard.press("Tab");
+  await expect(skip).toBeFocused();
+});
+
+test("sem violações críticas de acessibilidade",async({page})=>{
+  await page.goto(baseURL+"/index.html",{
+    waitUntil:"domcontentloaded",
+    timeout:20000
+  });
+
+  const results=await new AxeBuilder({page})
+    .withTags(["wcag2a","wcag2aa","wcag21a","wcag21aa"])
+    .analyze();
+
+  const critical=results.violations
+    .filter(item=>item.impact==="critical")
+    .map(item=>({
+      id:item.id,
+      help:item.help,
+      nodes:item.nodes.map(node=>node.target)
+    }));
+
+  expect(critical).toEqual([]);
 });
