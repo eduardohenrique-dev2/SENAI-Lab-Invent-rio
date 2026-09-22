@@ -50,6 +50,20 @@ function checkFile(file){
     }
   });
 
+  if(file.endsWith(".html")){
+    const ids=[...content.matchAll(/\bid=["']([^"']+)["']/g)]
+      .map(match=>match[1]);
+    const duplicates=[...new Set(
+      ids.filter((id,index)=>ids.indexOf(id)!==index)
+    )];
+
+    if(duplicates.length){
+      findings.push(
+        `${rel}: IDs HTML duplicados: ${duplicates.join(", ")}`
+      );
+    }
+  }
+
   if(file.endsWith(".sql")){
     lines.forEach((line,index)=>{
       if(/^\s*security\s+definer\b/i.test(line)){
