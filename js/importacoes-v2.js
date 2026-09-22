@@ -509,7 +509,10 @@
     await ensurePdfJs();
     let pdf;
     try {
-      pdf = await window.pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+      pdf = await window.pdfjsLib.getDocument({
+        data: await file.arrayBuffer(),
+        isEvalSupported: false
+      }).promise;
     } catch (error) {
       throw new Error(`Não foi possível abrir o PDF ${file.name}.`);
     }
