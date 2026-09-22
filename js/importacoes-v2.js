@@ -27,6 +27,31 @@
   const $ = id => document.getElementById(id);
   const db = () => obterInventarioSupabase();
 
+  const {
+    actionLabel,
+    typeLabel,
+    statusLabel,
+    batchLabel,
+    batchTone,
+    formatDateTime,
+    formatNumber,
+    formatBytes,
+    extension,
+    mimeFor,
+    safeFileName,
+    normalize,
+    clean,
+    cleanIdentifier,
+    nullable,
+    esc,
+    csvCell,
+    downloadBlob
+  }=window.InventoryUtils||{};
+
+  if(!window.InventoryUtils){
+    throw new Error("InventoryUtils não foi carregado.");
+  }
+
   const aliases = new Map();
   addAliases("codigo_interno", ["codigo", "código", "codigo interno", "código interno", "cod interno", "cod.", "id item", "codigo do item", "código do item"]);
   addAliases("patrimonio", ["patrimonio", "patrimônio", "n patrimonio", "nº patrimonio", "numero patrimonio", "número patrimônio", "tombamento", "tombo", "plaqueta", "placa patrimonio", "placa patrimônio"]);
@@ -1416,102 +1441,4 @@
     if ($(id)) $(id).textContent = String(value ?? "");
   }
 
-  function actionLabel(action) {
-    return ({ novo: "Novo", atualizar: "Atualizar", ignorar: "Ignorar", erro: "Erro" })[action] || action;
-  }
-
-  function typeLabel(type) {
-    return ({ equipamento: "Equipamento", material: "Material", componente: "Componente", consumivel: "Consumível" })[type] || type || "—";
-  }
-
-  function statusLabel(status) {
-    return ({ disponivel: "Disponível", em_uso: "Em uso", emprestado: "Emprestado", manutencao: "Manutenção", danificado: "Danificado", reservado: "Reservado", baixado: "Baixado", perdido: "Perdido" })[status] || status || "—";
-  }
-
-  function batchLabel(status) {
-    return ({ analisando: "Analisando", pronto: "Pronto", importando: "Importando", concluido: "Concluído", concluido_com_erros: "Concluído com erros", falhou: "Falhou", cancelado: "Cancelado" })[status] || status;
-  }
-
-  function batchTone(status) {
-    if (status === "concluido") return "disponivel";
-    if (status === "concluido_com_erros" || status === "importando") return "reservado";
-    if (status === "falhou") return "danificado";
-    return "em_uso";
-  }
-
-  function formatDateTime(value) {
-    if (!value) return "—";
-    const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? "—" : date.toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
-  }
-
-  function formatNumber(value) {
-    return new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 3 }).format(Number(value || 0));
-  }
-
-  function formatBytes(bytes) {
-    const value = Number(bytes || 0);
-    if (value < 1024) return `${value} B`;
-    if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`;
-    return `${(value / 1024 / 1024).toFixed(1)} MB`;
-  }
-
-  function extension(name) {
-    return String(name || "").split(".").pop().toLowerCase();
-  }
-
-  function mimeFor(name) {
-    const ext = extension(name);
-    if (ext === "pdf") return "application/pdf";
-    if (ext === "csv") return "text/csv";
-    if (ext === "xlsx") return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    if (ext === "xls") return "application/vnd.ms-excel";
-    return "application/octet-stream";
-  }
-
-  function safeFileName(name) {
-    return normalize(name).replace(/[^a-z0-9._-]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "").slice(0, 100) || "arquivo";
-  }
-
-  function normalize(value) {
-    return String(value ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
-  }
-
-  function clean(value) {
-    return String(value ?? "").trim();
-  }
-
-  function cleanIdentifier(value) {
-    const text = clean(value);
-    if (!text) return "";
-    const key = normalize(text).replace(/[._-]+/g, " ").replace(/\s+/g, " ").trim();
-    if (["na", "n a", "n/a", "s/id", "s id", "sem id", "sem identificacao", "sem identificação", "-", "--"].includes(key)) return "";
-    return text;
-  }
-
-  function nullable(value) {
-    const text = clean(value);
-    return text === "" ? null : text;
-  }
-
-  function esc(value) {
-    return String(value ?? "").replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
-  }
-
-  function csvCell(value) {
-    let text = String(value ?? "");
-    if (/^[=+\-@]/.test(text)) text = `'${text}`;
-    return `"${text.replace(/"/g, '""')}"`;
-  }
-
-  function downloadBlob(blob, filename) {
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 0);
-  }
 })();
