@@ -434,6 +434,14 @@
     return canAudit();
   }
 
+  function withTimeout(promise,ms=15000){
+    let timer;
+    const timeout=new Promise((_,reject)=>{
+      timer=setTimeout(()=>reject(new Error("Tempo de conexão esgotado.")),ms);
+    });
+    return Promise.race([promise,timeout]).finally(()=>clearTimeout(timer));
+  }
+
   async function loadAll({ silent = false } = {}) {
     if (!state.user || state.loading) return;
     state.loading = true;
@@ -441,7 +449,7 @@
 
     try {
       const c = client();
-      const essential = await Promise.all([
+      const essential = await withTimeout(Promise.all([
         c.from("inv_categorias").select("*").eq("ativo", true).order("nome"),
         c.from("inv_localizacoes").select("*").eq("ativo", true).order("nome"),
         state.profile.papel === "aluno"
@@ -450,7 +458,7 @@
         c.from("inv_emprestimos").select("*").order("criado_em", { ascending: false }).limit(500),
         c.from("inv_configuracoes").select("chave,valor"),
         c.rpc("inv_dashboard")
-      ]);
+      ]));
 
       essential.forEach(result => { if (result.error) throw result.error; });
       state.categories = essential[0].data || [];
@@ -460,7 +468,7 @@
       applySettingsRows(essential[4].data || []);
       state.dashboard = essential[5].data || {};
 
-      const optional = await Promise.all([
+      const optional = await withTimeout(Promise.all([
         (canOperate() || canAudit())
           ? c.from("inv_movimentacoes").select("*").order("criado_em", { ascending: false }).limit(700)
           : Promise.resolve({ data: [], error: null }),
@@ -480,7 +488,7 @@
           ? c.from("inv_auditoria").select("id,user_id,acao,entidade,entidade_id,dados,criado_em").order("criado_em", { ascending: false }).limit(500)
           : Promise.resolve({ data: [], error: null }),
         c.from("inv_notificacoes").select("*").order("criado_em", { ascending: false }).limit(300)
-      ]);
+      ]));
 
       optional.forEach(result => {
         if (result.error) console.warn("Consulta opcional do inventário falhou:", result.error.message);
