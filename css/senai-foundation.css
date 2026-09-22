@@ -1,29 +1,10 @@
-:root{
-  --senai-brand-blue:#0f5ba8;
-  --senai-brand-blue-strong:#06379a;
-  --senai-brand-navy:#10203a;
-  --senai-brand-orange:#f68b00;
-  --senai-brand-red:#e5654c;
+/* ============================================================
+   SENAI / Afonso Greco — Foundation compartilhada
 
-  --senai-bg:#f3f6f9;
-  --senai-surface:#ffffff;
-  --senai-surface-soft:#eef3f8;
-  --senai-text:#172333;
-  --senai-muted:#66798c;
-  --senai-line:#dce5ed;
-
-  --senai-success:#087544;
-  --senai-warning:#986400;
-  --senai-danger:#b12d34;
-
-  --senai-radius-sm:8px;
-  --senai-radius-md:12px;
-  --senai-radius-lg:18px;
-  --senai-shadow:0 18px 48px rgba(22,42,69,.10);
-
-  --senai-focus:#f5a623;
-  --senai-focus-ring:0 0 0 4px rgba(245,166,35,.24);
-}
+   Os valores de marca ficam exclusivamente em senai-tokens.css.
+   Este arquivo contém apenas comportamento, acessibilidade e
+   utilitários estruturais comuns.
+   ============================================================ */
 
 *,
 *::before,
@@ -32,9 +13,9 @@
 }
 
 :where(a,button,input,select,textarea,[tabindex]):focus-visible{
-  outline:3px solid var(--senai-focus);
+  outline:3px solid var(--senai-focus,#f5a623);
   outline-offset:3px;
-  box-shadow:var(--senai-focus-ring);
+  box-shadow:var(--senai-focus-ring,0 0 0 4px rgba(245,166,35,.24));
 }
 
 :where(button,[role="button"],input[type="button"],input[type="submit"],input[type="reset"]){
@@ -51,6 +32,28 @@
   clip:rect(0,0,0,0)!important;
   white-space:nowrap!important;
   border:0!important;
+}
+
+.skip-link{
+  position:fixed;
+  z-index:10000;
+  top:10px;
+  left:10px;
+  max-width:calc(100vw - 20px);
+  padding:10px 14px;
+  border-radius:var(--senai-radius-sm,10px);
+  background:var(--senai-brand-navy,#10203a);
+  color:#fff;
+  font-weight:800;
+  text-decoration:none;
+  box-shadow:var(--senai-shadow,0 18px 48px rgba(22,42,69,.10));
+  transform:translateY(-160%);
+  transition:transform var(--senai-motion-fast,140ms) ease;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible{
+  transform:translateY(0);
 }
 
 @media(prefers-reduced-motion:reduce){
@@ -78,26 +81,4 @@
   :where(button,a,[role="button"]){
     forced-color-adjust:auto;
   }
-}
-
-.skip-link{
-  position:fixed;
-  z-index:10000;
-  top:10px;
-  left:10px;
-  max-width:calc(100vw - 20px);
-  padding:10px 14px;
-  border-radius:10px;
-  background:var(--senai-brand-navy);
-  color:#fff;
-  font-weight:800;
-  text-decoration:none;
-  box-shadow:var(--senai-shadow);
-  transform:translateY(-160%);
-  transition:transform .16s ease;
-}
-
-.skip-link:focus,
-.skip-link:focus-visible{
-  transform:translateY(0);
 }
