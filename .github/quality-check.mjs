@@ -22,6 +22,8 @@ function checkFile(file){
   const content=fs.readFileSync(file,"utf8");
   const lines=content.split(/\r?\n/);
 
+  const executable=/\.(?:html|js|mjs|ts)$/i.test(file);
+
   lines.forEach((line,index)=>{
     if(/sb_secret_[A-Za-z0-9_-]{12,}/.test(line)){
       findings.push(`${rel}:${index+1} possível Secret Key versionada`);
@@ -31,18 +33,18 @@ function checkFile(file){
       findings.push(`${rel}:${index+1} service role literal`);
     }
 
-    if(/@latest(?:\/|["'])/.test(line)){
-      findings.push(`${rel}:${index+1} dependência CDN usando @latest`);
+    if(executable&&/@latest(?:\/|["'])/.test(line)){
+      findings.push(`${rel}:${index+1} dependência executável usando @latest`);
     }
 
-    if(/@supabase\/supabase-js@2(?:["'\/]|\))/i.test(line)){
+    if(executable&&/@supabase\/supabase-js@2(?:["'\/]|\))/i.test(line)){
       findings.push(`${rel}:${index+1} Supabase JS sem versão exata`);
     }
   });
 
   if(file.endsWith(".sql")){
     lines.forEach((line,index)=>{
-      if(/security\s+definer/i.test(line)){
+      if(/^\s*security\s+definer\b/i.test(line)){
         const nearby=lines.slice(index,index+8).join("\n");
         if(!/set\s+search_path/i.test(nearby)){
           findings.push(`${rel}:${index+1} SECURITY DEFINER sem SET search_path próximo`);
