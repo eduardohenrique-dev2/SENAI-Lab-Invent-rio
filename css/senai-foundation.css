@@ -79,3 +79,25 @@
     forced-color-adjust:auto;
   }
 }
+
+.skip-link{
+  position:fixed;
+  z-index:10000;
+  top:10px;
+  left:10px;
+  max-width:calc(100vw - 20px);
+  padding:10px 14px;
+  border-radius:10px;
+  background:var(--senai-brand-navy);
+  color:#fff;
+  font-weight:800;
+  text-decoration:none;
+  box-shadow:var(--senai-shadow);
+  transform:translateY(-160%);
+  transition:transform .16s ease;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible{
+  transform:translateY(0);
+}
