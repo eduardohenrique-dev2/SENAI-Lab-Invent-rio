@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="./css/importacoes.css?v=20260921-hardening1">
 </head>
 <body>
+  <a class="skip-link" href="#mainContent">Pular para o conteúdo</a>
   <!-- LOGIN -->
   <section id="loginScreen" class="login-screen">
     <div class="login-brand">
@@ -97,7 +98,7 @@
       </div>
     </aside>
 
-    <main class="main-shell">
+    <main id="mainContent" class="main-shell">
       <header class="topbar">
         <div class="topbar-left">
           <button id="btnMobileMenu" class="mobile-menu" type="button" aria-label="Abrir menu">☰</button>
@@ -310,7 +311,7 @@
   <!-- MODAL ITEM -->
   <div id="itemModal" class="modal-backdrop" hidden>
     <form id="itemForm" class="modal">
-      <header class="modal-header"><h2 id="itemModalTitle">Novo item</h2><button class="icon-button" type="button" data-close-modal="itemModal">×</button></header>
+      <header class="modal-header"><h2 id="itemModalTitle">Novo item</h2><button class="icon-button" type="button" data-close-modal="itemModal" aria-label="Fechar item">×</button></header>
       <div class="modal-body form-grid">
         <input id="itemId" type="hidden">
         <p class="form-section">Identificação</p>
