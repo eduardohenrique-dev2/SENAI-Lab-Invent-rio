@@ -349,3 +349,155 @@ tr:last-child td { border-bottom:0; }
     justify-content:space-between;
   }
 }
+
+
+/* Integração visual com o Portal Afonso Greco */
+.ecosystem-header{
+  min-height:68px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  padding:10px clamp(18px,3vw,42px);
+  border-bottom:1px solid rgba(255,255,255,.13);
+  background:linear-gradient(90deg,#071e31,#0b2d4d);
+  color:#fff;
+}
+.ecosystem-header__brand{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  text-decoration:none;
+}
+.ecosystem-header__brand img{
+  width:118px;
+  max-height:38px;
+  object-fit:contain;
+  filter:brightness(0) invert(1);
+}
+.ecosystem-header__brand span{
+  min-width:0;
+  display:grid;
+  padding-left:14px;
+  border-left:1px solid rgba(255,255,255,.2);
+}
+.ecosystem-header__brand strong{
+  font-size:.78rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.ecosystem-header__brand small{
+  color:#bfd0df;
+  font-size:.66rem;
+}
+.ecosystem-header__back{
+  flex:0 0 auto;
+  min-height:40px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 15px;
+  border:1px solid rgba(255,255,255,.28);
+  border-radius:10px;
+  background:rgba(255,255,255,.08);
+  color:#fff;
+  text-decoration:none;
+  font-size:.78rem;
+  font-weight:800;
+}
+.ecosystem-header__back:hover,
+.ecosystem-header__back:focus-visible{
+  background:#fff;
+  color:#06379a;
+}
+.login-screen{min-height:calc(100vh - 68px)}
+.app-shell{min-height:calc(100vh - 68px)}
+.login-brand__logo{
+  width:min(340px,72%);
+  padding:0;
+  border-radius:0;
+  background:transparent;
+  filter:brightness(0) invert(1);
+}
+.inventory-logo-home{display:inline-flex;align-items:center}
+.inventory-ecosystem-summary{
+  position:relative;
+  z-index:1;
+  margin-top:28px;
+  max-width:680px;
+  display:grid;
+  gap:14px;
+}
+.inventory-ecosystem-indicators{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.inventory-ecosystem-indicators span{
+  display:flex;
+  align-items:baseline;
+  gap:7px;
+  min-height:42px;
+  padding:9px 12px;
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:11px;
+  background:rgba(255,255,255,.08);
+  color:#dbeaff;
+  font-size:.72rem;
+}
+.inventory-ecosystem-indicators b{
+  color:#fff;
+  font-size:1rem;
+}
+.inventory-ecosystem-message{
+  min-height:48px;
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:10px 13px;
+  border-left:3px solid var(--senai-orange);
+  background:rgba(4,22,39,.18);
+}
+.inventory-ecosystem-message>span{
+  color:#ffbd63;
+  font-size:.52rem;
+  font-weight:900;
+  letter-spacing:.12em;
+}
+.inventory-ecosystem-message strong{
+  color:#fff;
+  font-size:.74rem;
+  line-height:1.4;
+  transition:opacity .22s ease,transform .22s ease;
+}
+.inventory-ecosystem-message strong.is-changing{
+  opacity:0;
+  transform:translateY(4px);
+}
+.sidebar-brand__box{
+  padding:0;
+  border-radius:0;
+  background:transparent;
+}
+.sidebar-brand img{
+  height:52px;
+  filter:brightness(0) invert(1);
+}
+@media(max-width:700px){
+  .ecosystem-header{min-height:60px;padding:8px 12px}
+  .ecosystem-header__brand img{width:92px}
+  .ecosystem-header__brand span{padding-left:10px}
+  .ecosystem-header__brand strong{font-size:.66rem}
+  .ecosystem-header__brand small{font-size:.58rem}
+  .ecosystem-header__back{min-height:38px;padding:0 10px;font-size:.68rem}
+  .login-screen,.app-shell{min-height:calc(100vh - 60px)}
+}
+@media(max-width:460px){
+  .ecosystem-header__brand span{display:none}
+  .inventory-ecosystem-indicators{display:grid;grid-template-columns:1fr 1fr}
+  .inventory-ecosystem-message{align-items:flex-start}
+}
+@media(prefers-reduced-motion:reduce){
+  .inventory-ecosystem-message strong{transition:none}
+}
