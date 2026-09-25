@@ -503,25 +503,28 @@ tr:last-child td { border-bottom:0; }
 }
 
 
-/* S institucional no hero do Inventário — substitui o círculo decorativo. */
+/* Três assinaturas S oficiais no hero do Inventário. */
 .login-brand::after{
-  content:"S";
+  content:"";
+  position:absolute;
+  inset:0;
   width:auto;
   height:auto;
-  right:-36px;
-  bottom:-92px;
   border:0;
   border-radius:0;
-  color:rgba(255,255,255,.105);
-  background:none;
-  font-family:"Neo Sans Pro Local","Neo Sans Pro",Barlow,Arial,sans-serif;
-  font-size:clamp(280px,31vw,520px);
-  font-weight:950;
-  line-height:.78;
-  letter-spacing:-.1em;
-  transform:rotate(-8deg);
   pointer-events:none;
-  user-select:none;
+  background-image:
+    url("../assets/ativo-1s.svg"),
+    url("../assets/ativo-2s.svg"),
+    url("../assets/ativo-3s.svg");
+  background-repeat:no-repeat;
+  background-size:310px auto,470px auto,250px auto;
+  background-position:
+    left -115px bottom -110px,
+    right -135px top -110px,
+    right 16px bottom -120px;
+  opacity:.13;
+  transform:none;
 }
 .login-brand>a,
 .login-brand>h1,
@@ -536,4 +539,44 @@ tr:last-child td { border-bottom:0; }
     bottom:-65px;
     font-size:300px;
   }
+}
+
+
+/* Assinaturas S no topo do Inventário */
+.topbar{
+  overflow:hidden;
+  isolation:isolate;
+}
+.topbar::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background-image:
+    url("../assets/ativo-1s.svg"),
+    url("../assets/ativo-2s.svg"),
+    url("../assets/ativo-3s.svg");
+  background-repeat:no-repeat;
+  background-size:90px auto,135px auto,72px auto;
+  background-position:
+    left -38px bottom -42px,
+    right -42px top -48px,
+    right 4px bottom -42px;
+  opacity:.035;
+}
+.topbar>*{
+  position:relative;
+  z-index:1;
+}
+@media(max-width:700px){
+  .login-brand::after{
+    background-size:200px auto,300px auto,160px auto;
+    background-position:
+      left -90px bottom -75px,
+      right -110px top -65px,
+      right -10px bottom -86px;
+    opacity:.09;
+  }
+  .topbar::after{opacity:.025}
 }
