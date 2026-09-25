@@ -11,17 +11,34 @@
   <link rel="stylesheet" href="./css/senai-tokens.css?v=20260922-ds2">
   <link rel="stylesheet" href="./css/senai-foundation.css?v=20260922-ds2">
   <link rel="stylesheet" href="./css/tipografia-senai.css">
-  <link rel="stylesheet" href="./css/app.css?v=20260922-ds1">
+  <link rel="stylesheet" href="./css/app.css?v=20260925-eco1">
   <link rel="stylesheet" href="./css/importacoes.css?v=20260921-hardening1">
 </head>
 <body>
   <a class="skip-link" href="#mainContent">Pular para o conteúdo</a>
+  <header class="ecosystem-header" aria-label="Navegação institucional SENAI Afonso Greco">
+    <a class="ecosystem-header__brand" href="./index.html" aria-label="SENAI Lab Inventário — início">
+      <img src="./assets/logo-senai-lab.svg" alt="SENAI Lab">
+      <span><strong>Afonso Greco</strong><small>SENAI Lab / Inventário</small></span>
+    </a>
+    <a class="ecosystem-header__back" href="https://portal-afonso-greco.vercel.app/" aria-label="Voltar ao Portal Afonso Greco">← Voltar ao Portal</a>
+  </header>
   <!-- LOGIN -->
   <section id="loginScreen" class="login-screen">
     <div class="login-brand">
       <a class="inventory-logo-home" href="./index.html" aria-label="Ir para a página inicial do Inventário"><img class="login-brand__logo" src="./assets/logo-senai-lab.svg" alt="SENAI Lab"></a>
       <h1>INVENTÁRIO<br><span>INTELIGENTE</span></h1>
       <p>Patrimônio, estoque, empréstimos, manutenção, localização física, QR Code e rastreabilidade completa do laboratório em uma única plataforma.</p>
+      <div class="inventory-ecosystem-summary" aria-label="Indicadores do ecossistema">
+        <div class="inventory-ecosystem-indicators">
+          <span><b>4</b> plataformas conectadas</span>
+          <span><b>1</b> portal central</span>
+        </div>
+        <div class="inventory-ecosystem-message" aria-label="Mensagem institucional">
+          <span>SENAI</span>
+          <strong id="inventoryMessageRotator">Conectando pessoas, informação e tecnologia.</strong>
+        </div>
+      </div>
     </div>
 
     <div class="login-panel">
@@ -390,6 +407,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/4.2.1/jspdf.umd.min.js" integrity="sha512-+EeCylkt9WHJk5tGJxYdecHOcXFRME7qnbsfeMsdQL6NUPYm2+uGFmyleEqsmVoap/f3dN/sc3BX9t9kHXkHHg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@5.0.8/dist/jspdf.plugin.autotable.min.js"></script>
   <script src="./js/config.js"></script>
+  <script src="./js/ecosystem-ui.js?v=20260925-eco1" defer></script>
   <script src="./js/inventory-domain.js?v=20260921-hardening1"></script>
   <script src="./js/inventory-utils.js?v=20260921-hardening1"></script>
   <script src="./js/app.js?v=20260921-hardening4"></script>
