@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="./css/senai-tokens.css?v=20260922-ds2">
   <link rel="stylesheet" href="./css/senai-foundation.css?v=20260922-ds2">
   <link rel="stylesheet" href="./css/tipografia-senai.css">
-  <link rel="stylesheet" href="./css/app.css?v=20260925-sglobal1">
+  <link rel="stylesheet" href="./css/app.css?v=20260930-nocaptcha1">
   <link rel="stylesheet" href="./css/importacoes.css?v=20260921-hardening1">
 </head>
 <body>
@@ -56,8 +56,6 @@
         </div>
 
         <a class="login-reset-link" href="https://portal-afonso-greco.vercel.app/esqueci-senha.html">Esqueci / redefinir minha senha</a>
-        <div id="inventoryLoginCaptcha" class="h-captcha" aria-label="Verificação de segurança"></div>
-        <p id="inventoryCaptchaStatus" class="login-captcha-status" role="status"></p>
         <p id="loginError" class="login-error" hidden></p>
         <button id="btnLogin" class="button" type="submit" style="width:100%">Entrar no sistema</button>
         <p class="login-help">O acesso combina as permissões do Portal Afonso Greco com o perfil interno do Inventário.</p>
@@ -400,8 +398,6 @@
   <div id="toastStack" class="toast-stack" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.115.0"></script>
-  <script src="./js/captcha-trust.js?v=20260921-captcha5m2"></script>
-  <script src="https://js.hcaptcha.com/1/api.js?onload=inventarioCaptchaInit&amp;render=explicit" async defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/4.2.1/jspdf.umd.min.js" integrity="sha512-+EeCylkt9WHJk5tGJxYdecHOcXFRME7qnbsfeMsdQL6NUPYm2+uGFmyleEqsmVoap/f3dN/sc3BX9t9kHXkHHg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -410,7 +406,7 @@
   <script src="./js/ecosystem-ui.js?v=20260925-eco1" defer></script>
   <script src="./js/inventory-domain.js?v=20260921-hardening1"></script>
   <script src="./js/inventory-utils.js?v=20260921-hardening1"></script>
-  <script src="./js/app.js?v=20260921-hardening4"></script>
+  <script src="./js/app.js?v=20260930-nocaptcha1"></script>
   <script src="./js/importacoes-v2.js?v=20260921-hardening1"></script>
   <script src="./js/portal-module-gate.js?v=20260921-rbac1"></script>
   <script src="./js/logo-home.js?v=20260918-1"></script>
