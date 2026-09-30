@@ -1,6 +1,7 @@
 const INVENTARIO_CONFIG = Object.freeze({
   supabaseUrl: "https://lnzcrdyqqumvrlgbcofd.supabase.co",
-  supabasePublishableKey: "sb_publishable_Fc3j2jCiD5FN8l1t6dI4Rg_9WqeVLWP",  storagePublicBucket: "inventario-publico",
+  supabasePublishableKey: "sb_publishable_Fc3j2jCiD5FN8l1t6dI4Rg_9WqeVLWP",
+  storagePublicBucket: "inventario-publico",
   storagePrivateBucket: "inventario-privado",
   publicItemPath: "/item.html",
   appName: "SENAI Lab Inventário",
@@ -8,27 +9,6 @@ const INVENTARIO_CONFIG = Object.freeze({
 });
 
 let inventarioSupabaseClient = null;
-
-/*
- * Alguns navegadores móveis, bloqueadores de conteúdo, VPNs e redes
- * corporativas impedem o carregamento do hCaptcha. O frontend não deve
- * impedir o envio do login nesses casos: o Supabase Auth continua sendo
- * a autoridade final e, caso CAPTCHA esteja obrigatório no servidor,
- * a autenticação será recusada normalmente.
- *
- * Este stub existe apenas para evitar que a validação local do app.js
- * bloqueie a tentativa antes que ela chegue ao Supabase. Se o hCaptcha
- * carregar normalmente, a biblioteca substitui window.hcaptcha e o token
- * real continua sendo utilizado.
- */
-if (!window.hcaptcha?.getResponse) {
-  window.hcaptcha = {
-    getResponse() {
-      return INVENTARIO_CAPTCHA_FALLBACK_TOKEN;
-    },
-    reset() {}
-  };
-}
 
 function obterInventarioSupabase() {
   if (!window.supabase?.createClient) {
