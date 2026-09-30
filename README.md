@@ -152,7 +152,6 @@ No **mesmo projeto Supabase** já usado pelo SENAI Lab:
 2. Execute `supabase/02_seed_inicial.sql` e confirme `OK - dados iniciais criados`.
 3. Execute `supabase/03_importacoes_uploads.sql` e confirme `OK - módulo Uploads / Importações ativado`.
 4. Faça o deploy deste repositório na Vercel.
-5. Adicione o domínio final da Vercel aos hostnames permitidos do hCaptcha, caso a sua configuração do hCaptcha exija allowlist por domínio.
 6. Acesse `/` e entre com a mesma conta autorizada do SENAI Lab.
 
 ## QR Code
