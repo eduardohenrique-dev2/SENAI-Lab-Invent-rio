@@ -308,13 +308,6 @@ tr:last-child td { border-bottom:0; }
   text-decoration:none;
 }
 .login-reset-link:hover{text-decoration:underline}
-.login-captcha-status{
-  min-height:16px;
-  margin:6px 0 2px;
-  color:var(--muted);
-  font-size:.72rem;
-  line-height:1.4;
-}
 .sidebar-user__card .icon-button{
   flex:0 0 auto;
   text-decoration:none;
