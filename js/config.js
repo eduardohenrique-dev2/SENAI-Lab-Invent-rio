@@ -1,15 +1,11 @@
 const INVENTARIO_CONFIG = Object.freeze({
   supabaseUrl: "https://lnzcrdyqqumvrlgbcofd.supabase.co",
-  supabasePublishableKey: "sb_publishable_Fc3j2jCiD5FN8l1t6dI4Rg_9WqeVLWP",
-  hcaptchaSiteKey: "99b6aeca-0a42-4d56-b8be-06f0e2c068f6",
-  storagePublicBucket: "inventario-publico",
+  supabasePublishableKey: "sb_publishable_Fc3j2jCiD5FN8l1t6dI4Rg_9WqeVLWP",  storagePublicBucket: "inventario-publico",
   storagePrivateBucket: "inventario-privado",
   publicItemPath: "/item.html",
   appName: "SENAI Lab Inventário",
   realtimeFallbackMs: 30000
 });
-
-const INVENTARIO_CAPTCHA_FALLBACK_TOKEN = "__senai_lab_captcha_unavailable__";
 
 let inventarioSupabaseClient = null;
 
@@ -54,22 +50,6 @@ function obterInventarioSupabase() {
         }
       }
     );
-
-    const auth = inventarioSupabaseClient.auth;
-    const signInWithPasswordOriginal = auth.signInWithPassword.bind(auth);
-
-    auth.signInWithPassword = credentials => {
-      const captchaToken = String(credentials?.options?.captchaToken || "");
-
-      if (captchaToken === INVENTARIO_CAPTCHA_FALLBACK_TOKEN) {
-        return signInWithPasswordOriginal({
-          email: credentials?.email,
-          password: credentials?.password
-        });
-      }
-
-      return signInWithPasswordOriginal(credentials);
-    };
   }
 
   return inventarioSupabaseClient;
