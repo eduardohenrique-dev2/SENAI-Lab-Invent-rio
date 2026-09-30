@@ -249,27 +249,19 @@
     button.textContent = "Entrando...";
 
     try {
-      const captchaToken = await window.inventoryCaptcha.getToken();
       const { data, error } = await client().auth.signInWithPassword({
         email,
-        password,
-        options: { captchaToken }
+        password
       });
       if (error) throw error;
       await restoreSession(data.user);
     } catch (error) {
       console.error("Falha no login:", error);
-      showLoginError("Não foi possível entrar. Confira seus dados, sua permissão e refaça a verificação de segurança.");
-      window.inventoryCaptcha?.reset();
+      showLoginError("Não foi possível entrar. Confira seus dados e sua permissão.");
     } finally {
       button.disabled = false;
       button.textContent = "Entrar no sistema";
     }
-  }
-
-  function getCaptchaToken() {
-    try { return String(window.hcaptcha?.getResponse?.() || "").trim(); }
-    catch (_) { return ""; }
   }
 
   async function restoreSession(user) {
@@ -358,7 +350,6 @@
     $("appShell").hidden = true;
     $("loginScreen").hidden = false;
     setHealth("checking", "Conectando");
-    try { window.hcaptcha?.reset(); } catch (_) {}
   }
 
   function applyPermissions() {
