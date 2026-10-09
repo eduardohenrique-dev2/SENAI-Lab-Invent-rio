@@ -1,7 +1,7 @@
 :root{
   /* ==========================================================
-     SENAI / Afonso Greco — Design Tokens compartilhados
-     Fonte única de verdade para os quatro sistemas.
+     SENAI / Afonso Greco — Design System DS3
+     Fonte única de verdade visual para o ecossistema.
      ========================================================== */
 
   /* Marca */
@@ -12,6 +12,11 @@
   --senai-brand-orange:#f5a623;
   --senai-brand-red:#e5654c;
 
+  /* Semântica de marca */
+  --senai-primary:var(--senai-brand-blue);
+  --senai-primary-strong:var(--senai-brand-blue-strong);
+  --senai-accent:var(--senai-brand-orange);
+
   /* Texto e superfícies */
   --senai-ink:#14263b;
   --senai-text:var(--senai-ink);
@@ -20,6 +25,10 @@
   --senai-surface:#ffffff;
   --senai-surface-soft:#eef3f8;
   --senai-line:#dce5ed;
+
+  /* Aliases semânticos de superfície */
+  --senai-card:var(--senai-surface);
+  --senai-border:var(--senai-line);
 
   /* Estados */
   --senai-success:#12a56a;
@@ -45,6 +54,13 @@
   --senai-radius-md:14px;
   --senai-radius-lg:20px;
   --senai-radius-pill:999px;
+  --senai-radius-control:14px;
+  --senai-control-height:44px;
+
+  /* Larguras estruturais */
+  --senai-content-sm:720px;
+  --senai-content-md:960px;
+  --senai-content-lg:1180px;
 
   /* Elevação */
   --senai-shadow-sm:0 8px 24px rgba(23,52,80,.08);
