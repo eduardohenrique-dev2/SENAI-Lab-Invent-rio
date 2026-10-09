@@ -94,6 +94,15 @@ function checkFile(file){
     }
   }
 
+  if(file.endsWith(".html")&&path.basename(file)!=="404.html"){
+    if(!content.includes("senai-tokens.css")){
+      findings.push(`${rel} deve carregar css/senai-tokens.css`);
+    }
+    if(!content.includes("senai-foundation.css")){
+      findings.push(`${rel} deve carregar css/senai-foundation.css`);
+    }
+  }
+
   if(file.endsWith(".sql")){
     lines.forEach((line,index)=>{
       if(/^\s*security\s+definer\b/i.test(line)){
